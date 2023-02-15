@@ -1,0 +1,41 @@
+version: '3.9'
+
+services:
+  nodejs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/node_app/app
+    command: /bin/sh -c "chmod +x entrypoint.sh && /node_app/app/entrypoint.sh"
+    env_file:
+      - .env
+    restart: always
+
+  nginx:
+    image: nginx:1.23.3
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - nodejs
+
+  mysql:
+    image: mysql:8.0
+    env_file:
+      - .env
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./docker/mysql:/var/lib/mysql
+    restart: always
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080

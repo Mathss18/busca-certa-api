@@ -1,0 +1,7 @@
+.dockerignore
+.env
+.gitignore
+docker-compose.yaml
+Dockerfile
+node_modules
+load-tests
