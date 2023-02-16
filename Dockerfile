@@ -10,5 +10,4 @@ WORKDIR /node_app/app
 COPY . .
 # EXPOSE 3000
 
-USER node
 CMD ["npm", "run", "start:dev"]
