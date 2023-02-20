@@ -5,7 +5,7 @@ export class Validator {
     const errors = validateSync(this, { stopAtFirstError: false });
     if (errors.length) {
       for (const error of errors) {
-        return JSON.stringify(error.constraints);
+        throw new Error(JSON.stringify(error.constraints));
       }
     }
   }

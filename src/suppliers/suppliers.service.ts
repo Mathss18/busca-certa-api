@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Supplier } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
@@ -7,27 +8,41 @@ import { UpdateSupplierDto } from './dto/update-supplier.dto';
 export class SuppliersService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createSupplierDto: CreateSupplierDto) {
-    const supplier = await this.prisma.supplier.create({
+  async create(createSupplierDto: CreateSupplierDto): Promise<Supplier> {
+    return await this.prisma.supplier.create({
       data: createSupplierDto,
     });
-    console.log(supplier);
-    return supplier;
   }
 
-  findAll() {
+  async findAll(): Promise<Supplier[]> {
     return this.prisma.supplier.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} supplier`;
+  async findOne(id: number): Promise<Supplier> {
+    return this.prisma.supplier.findFirst({
+      where: {
+        id,
+      },
+    });
   }
 
-  update(id: number, updateSupplierDto: UpdateSupplierDto) {
-    return `This action updates a #${id} supplier`;
+  async update(
+    id: number,
+    updateSupplierDto: UpdateSupplierDto,
+  ): Promise<Supplier> {
+    return this.prisma.supplier.update({
+      data: updateSupplierDto,
+      where: {
+        id,
+      },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} supplier`;
+  async remove(id: number): Promise<Supplier> {
+    return this.prisma.supplier.delete({
+      where: {
+        id,
+      },
+    });
   }
 }
