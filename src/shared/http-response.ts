@@ -5,7 +5,13 @@ export interface HttpResponseInterface {
 }
 
 export class HttpReturn {
-  public static build({ success, data, message }: HttpResponseInterface) {
+  public static build(
+    { success, data, message }: HttpResponseInterface = {
+      success: true,
+      data: {},
+      message: '',
+    },
+  ) {
     return {
       success: success ?? true,
       data: data ?? {},

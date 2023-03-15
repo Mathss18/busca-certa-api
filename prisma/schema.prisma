@@ -11,28 +11,174 @@ datasource db {
 }
 
 model Supplier {
-  id           Int     @id @default(autoincrement())
-  companyName  String
-  tradingName  String
-  cnpj         String  @unique
-  email        String  @unique
-  phoneNumber  String?
-  mobileNumber String
-  segment      String
-  website      String?
-  description  String?
-  logo         String?
-
-  street       String
-  number       String
-  neighborhood String
-  city         String
-  state        String
-  zipCode      String
-
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 Int                @id @default(autoincrement())
+  companyName        String
+  tradingName        String
+  cnpj               String             @unique
+  email              String             @unique
+  phoneNumber        String?
+  mobileNumber       String
+  segment            String
+  website            String?
+  description        String?
+  logo               String?
+  street             String
+  number             String
+  neighborhood       String
+  city               String
+  state              String
+  zipCode            String
+  supplierCategoryId Int?
+  supplierCategory   SuppliersCategory? @relation(fields: [supplierCategoryId], references: [id])
+  products           Products[]
+  active             Boolean            @default(true)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 
   @@map("suppliers")
+}
+
+model SuppliersCategory {
+  id            Int                 @id @default(autoincrement())
+  name          String
+  parentId      Int?
+  parent        SuppliersCategory?  @relation("SubSuppliersCategory", fields: [parentId], references: [id])
+  subcategories SuppliersCategory[] @relation("SubSuppliersCategory")
+  suppliers     Supplier[]
+  active        Boolean             @default(true)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@map("suppliers_categories")
+}
+
+model Products {
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  description        String
+  sku                String?
+  image              String?
+  price              Float
+  priceUpdatedAt     DateTime
+  supplierId         Int
+  supplier           Supplier            @relation(fields: [supplierId], references: [id])
+  productCategory    ProductsCategory?   @relation(fields: [productCategoryId], references: [id])
+  productCategoryId  Int?
+  active             Boolean             @default(true)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  productsVariations ProductVariations[]
+  basketDetails      BasketDetails[]
+
+  @@map("products")
+}
+
+model ProductsCategory {
+  id            Int                @id @default(autoincrement())
+  name          String
+  parentId      Int?
+  parent        ProductsCategory?  @relation("SubProductsCategory", fields: [parentId], references: [id])
+  subcategories ProductsCategory[] @relation("SubProductsCategory")
+  products      Products[]
+  active        Boolean            @default(true)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  @@map("products_categories")
+}
+
+model Variations {
+  id                Int                 @id @default(autoincrement())
+  name              String              @unique
+  active            Boolean             @default(true)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  variationsOptions VariationOptions[]
+  productsVariation ProductVariations[]
+  basketVariations  BasketVariations[]
+
+  @@map("variations")
+}
+
+model VariationOptions {
+  id                       Int                       @id @default(autoincrement())
+  name                     String
+  variation                Variations                @relation(fields: [variationId], references: [id])
+  variationId              Int
+  active                   Boolean                   @default(true)
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
+  basketVariations         BasketVariations[]
+  productsVariationOptions ProductVariationOptions[]
+
+  @@map("variation_options")
+}
+
+model ProductVariations {
+  id                      Int                       @id @default(autoincrement())
+  product                 Products                  @relation(fields: [productId], references: [id])
+  productId               Int
+  variation               Variations                @relation(fields: [variationId], references: [id])
+  variationId             Int
+  active                  Boolean                   @default(true)
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  productVariationOptions ProductVariationOptions[]
+
+  @@map("product_variations")
+}
+
+model ProductVariationOptions {
+  id                 Int               @id @default(autoincrement())
+  productVariation   ProductVariations @relation(fields: [productVariationId], references: [id])
+  productVariationId Int
+  variationOption    VariationOptions  @relation(fields: [variationOptionId], references: [id])
+  variationOptionId  Int
+  active             Boolean           @default(true)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@map("product_variation_options")
+}
+
+model Baskets {
+  id            Int             @id @default(autoincrement())
+  customerId    Int
+  basketDetails BasketDetails[]
+  active        Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@map("baskets")
+}
+
+model BasketDetails {
+  id               Int                @id @default(autoincrement())
+  basketId         Int
+  basket           Baskets            @relation(fields: [basketId], references: [id])
+  productsId       Int
+  product          Products           @relation(fields: [productsId], references: [id])
+  quantity         Float
+  itemNumber       Int
+  basketVariations BasketVariations[]
+  active           Boolean            @default(true)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@map("basket_details")
+}
+
+model BasketVariations {
+  id                  Int              @id @default(autoincrement())
+  basketDetailsId     Int
+  basketDetails       BasketDetails    @relation(fields: [basketDetailsId], references: [id])
+  variationsId        Int
+  variation           Variations       @relation(fields: [variationsId], references: [id])
+  variationsOptionsId Int
+  variationOption     VariationOptions @relation(fields: [variationsOptionsId], references: [id])
+  active              Boolean          @default(true)
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  @@map("basket_variations")
 }

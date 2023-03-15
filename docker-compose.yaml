@@ -8,6 +8,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    networks:
+      - network
+    container_name: facilite-node
     volumes:
       - .:/node_app/app
     command: /bin/sh -c "chmod +x entrypoint.sh && /node_app/app/entrypoint.sh"
@@ -18,8 +21,11 @@ services:
     image: nginx:1.23.3
     ports:
       - "80:80"
+    container_name: facilite-nginx
     volumes:
       - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - network
     depends_on:
       - nodejs
 
@@ -29,6 +35,11 @@ services:
       - .env
     ports:
       - '3306:3306'
+    networks:
+      network:
+        aliases:
+          - mysql
+    container_name: facilite-mysql
     volumes:
       - ./docker/mysql:/var/lib/mysql
     restart: always
@@ -37,5 +48,12 @@ services:
   adminer:
     image: adminer
     restart: always
+    container_name: facilite-adminer
     ports:
       - 8080:8080
+    networks:
+      - network
+
+networks:
+  network:
+    driver: bridge

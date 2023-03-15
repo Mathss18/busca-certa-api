@@ -5,3 +5,4 @@ docker-compose.yaml
 Dockerfile
 node_modules
 load-tests
+facilite.sh

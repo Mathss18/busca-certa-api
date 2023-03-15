@@ -1,18 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Supplier } from '@prisma/client';
-import { PrismaService } from 'src/database/prisma.service';
+import { PrismaService } from '../database/prisma.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
 
 @Injectable()
 export class SuppliersService {
   constructor(private prisma: PrismaService) {}
-
-  async create(createSupplierDto: CreateSupplierDto): Promise<Supplier> {
-    return await this.prisma.supplier.create({
-      data: createSupplierDto,
-    });
-  }
 
   async findAll(): Promise<Supplier[]> {
     return this.prisma.supplier.findMany();
@@ -23,6 +17,12 @@ export class SuppliersService {
       where: {
         id,
       },
+    });
+  }
+
+  async create(createSupplierDto: CreateSupplierDto): Promise<Supplier> {
+    return this.prisma.supplier.create({
+      data: createSupplierDto,
     });
   }
 

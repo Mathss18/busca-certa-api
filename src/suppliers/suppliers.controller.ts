@@ -12,10 +12,8 @@ import {
 import { SuppliersService } from './suppliers.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
-import { CreateSupplierValidator } from './validator/create-supplier.validator';
 import { Response } from 'express';
-import { HttpReturn } from 'src/shared/http-response';
-import { UpdateSupplierValidator } from './validator/update-supplier.validator';
+import { HttpReturn } from '../shared/http-response';
 
 @Controller('suppliers')
 export class SuppliersController {
@@ -27,7 +25,6 @@ export class SuppliersController {
     @Res() res: Response,
   ) {
     try {
-      new CreateSupplierValidator(createSupplierDto).validate();
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
           data: await this.suppliersService.create(createSupplierDto),
@@ -77,7 +74,6 @@ export class SuppliersController {
     @Res() res: Response,
   ) {
     try {
-      new UpdateSupplierValidator(updateSupplierDto).validate();
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
           data: await this.suppliersService.update(+id, updateSupplierDto),
