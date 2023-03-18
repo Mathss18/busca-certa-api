@@ -31,7 +31,6 @@ export class ProductsController {
         }),
       );
     } catch (error) {
-      console.log(error);
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json(HttpReturn.build({ success: false, message: error.message }));

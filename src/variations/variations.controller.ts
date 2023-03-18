@@ -25,7 +25,7 @@ export class VariationsController {
     @Res() res: Response,
   ) {
     try {
-      res.status(HttpStatus.OK).json(
+      return res.status(HttpStatus.OK).json(
         HttpReturn.build({
           data: await this.variationsService.create(createVariationDto),
         }),
@@ -40,7 +40,7 @@ export class VariationsController {
   @Get()
   async findAll(@Res() res: Response) {
     try {
-      res.status(HttpStatus.OK).json(
+      return res.status(HttpStatus.OK).json(
         HttpReturn.build({
           data: await this.variationsService.findAll(),
         }),
@@ -55,7 +55,7 @@ export class VariationsController {
   @Get(':id')
   async findOne(@Param('id') id: string, @Res() res: Response) {
     try {
-      res.status(HttpStatus.OK).json(
+      return res.status(HttpStatus.OK).json(
         HttpReturn.build({
           data: await this.variationsService.findOne(+id),
         }),
@@ -74,7 +74,7 @@ export class VariationsController {
     @Res() res: Response,
   ) {
     try {
-      res.status(HttpStatus.OK).json(
+      return res.status(HttpStatus.OK).json(
         HttpReturn.build({
           data: await this.variationsService.update(+id, updateVariationDto),
         }),
@@ -89,7 +89,7 @@ export class VariationsController {
   @Delete(':id')
   async remove(@Param('id') id: string, @Res() res: Response) {
     try {
-      res.status(HttpStatus.OK).json(
+      return res.status(HttpStatus.OK).json(
         HttpReturn.build({
           data: await this.variationsService.remove(+id),
         }),

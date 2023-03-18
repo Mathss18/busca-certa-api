@@ -65,7 +65,7 @@ export class VariationOptionsController {
   @Get(':id')
   async findOne(@Param('id') id: string, @Res() res: Response) {
     try {
-      res.status(HttpStatus.OK).json(
+      return res.status(HttpStatus.OK).json(
         HttpReturn.build({
           data: await this.variationOptionsService.findOne(+id),
         }),
@@ -84,7 +84,7 @@ export class VariationOptionsController {
     @Res() res: Response,
   ) {
     try {
-      res.status(HttpStatus.OK).json(
+      return res.status(HttpStatus.OK).json(
         HttpReturn.build({
           data: await this.variationOptionsService.update(
             +id,
@@ -100,11 +100,11 @@ export class VariationOptionsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @Res() res: Response) {
+  async remove(@Param('id') id: string, @Res() res: Response) {
     try {
-      res.status(HttpStatus.OK).json(
+      return res.status(HttpStatus.OK).json(
         HttpReturn.build({
-          data: this.variationOptionsService.remove(+id),
+          data: await this.variationOptionsService.remove(+id),
         }),
       );
     } catch (error) {
