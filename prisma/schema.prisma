@@ -182,3 +182,14 @@ model BasketVariations {
 
   @@map("basket_variations")
 }
+
+model Users {
+  id Int @id @default(autoincrement())
+  name String
+  email String @unique
+  password String
+  type String
+  active Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

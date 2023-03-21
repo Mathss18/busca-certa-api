@@ -3,33 +3,28 @@ import {
   Get,
   Post,
   Body,
+  Put,
   Param,
   Delete,
   Res,
   HttpStatus,
-  Put,
-  UseGuards,
 } from '@nestjs/common';
-import { SuppliersService } from './suppliers.service';
-import { CreateSupplierDto } from './dto/create-supplier.dto';
-import { UpdateSupplierDto } from './dto/update-supplier.dto';
-import { Response } from 'express';
 import { HttpReturn } from '../shared/http-response';
-import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
+import { Response } from 'express';
+import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
-@Controller('suppliers')
-export class SuppliersController {
-  constructor(private readonly suppliersService: SuppliersService) {}
+@Controller('users')
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  async create(
-    @Body() createSupplierDto: CreateSupplierDto,
-    @Res() res: Response,
-  ) {
+  async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
-          data: await this.suppliersService.create(createSupplierDto),
+          data: await this.usersService.create(createUserDto),
         }),
       );
     } catch (error) {
@@ -39,15 +34,14 @@ export class SuppliersController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get()
   async findAll(@Res() res: Response) {
     try {
-      return res
-        .status(HttpStatus.OK)
-        .json(
-          HttpReturn.build({ data: await this.suppliersService.findAll() }),
-        );
+      return res.status(HttpStatus.OK).json(
+        HttpReturn.build({
+          data: await this.usersService.findAll(),
+        }),
+      );
     } catch (error) {
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -58,11 +52,11 @@ export class SuppliersController {
   @Get(':id')
   async findOne(@Param('id') id: string, @Res() res: Response) {
     try {
-      return res
-        .status(HttpStatus.OK)
-        .json(
-          HttpReturn.build({ data: await this.suppliersService.findOne(+id) }),
-        );
+      return res.status(HttpStatus.OK).json(
+        HttpReturn.build({
+          data: await this.usersService.findOne(+id),
+        }),
+      );
     } catch (error) {
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -73,13 +67,15 @@ export class SuppliersController {
   @Put(':id')
   async update(
     @Param('id') id: string,
-    @Body() updateSupplierDto: UpdateSupplierDto,
+    @Body() updateUserDto: UpdateUserDto,
     @Res() res: Response,
   ) {
     try {
+      delete updateUserDto?.password;
+
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
-          data: await this.suppliersService.update(+id, updateSupplierDto),
+          data: await this.usersService.update(+id, updateUserDto),
         }),
       );
     } catch (error) {
@@ -94,7 +90,7 @@ export class SuppliersController {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
-          data: await this.suppliersService.remove(+id),
+          data: await this.usersService.remove(+id),
         }),
       );
     } catch (error) {

@@ -9,6 +9,11 @@ import { VariationsModule } from './variations/variations.module';
 import { VariationOptionsModule } from './variation-options/variation-options.module';
 import { ProductVariationsModule } from './product-variations/product-variations.module';
 import { ProductVariationOptionsModule } from './product-variation-options/product-variation-options.module';
+import { AuthService } from './auth/auth.service';
+import { AuthModule } from './auth/auth.module';
+import { JwtService } from '@nestjs/jwt';
+import { UsersModule } from './users/users.module';
+import { LocalStrategy } from './auth/strategies/local.strategy';
 
 @Module({
   imports: [
@@ -20,8 +25,10 @@ import { ProductVariationOptionsModule } from './product-variation-options/produ
     VariationOptionsModule,
     ProductVariationsModule,
     ProductVariationOptionsModule,
+    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AuthService, JwtService, LocalStrategy],
 })
 export class AppModule {}
