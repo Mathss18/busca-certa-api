@@ -23,6 +23,9 @@ export class VariationsService {
       where: {
         id,
       },
+      include: {
+        variationsOptions: true,
+      },
     });
   }
 

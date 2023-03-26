@@ -6,10 +6,10 @@ import { UpdateSuppliersCategoryDto } from './dto/update-suppliers-category.dto'
 
 @Injectable()
 export class SuppliersCategoryService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prismaService: PrismaService) {}
 
   async findAll(): Promise<SuppliersCategory[]> {
-    return this.prisma.suppliersCategory.findMany({
+    return this.prismaService.suppliersCategory.findMany({
       include: {
         parent: {
           select: {
@@ -22,7 +22,7 @@ export class SuppliersCategoryService {
   }
 
   async findOne(id: number): Promise<SuppliersCategory> {
-    return this.prisma.suppliersCategory.findFirst({
+    return this.prismaService.suppliersCategory.findFirst({
       where: {
         id,
       },
@@ -32,7 +32,7 @@ export class SuppliersCategoryService {
   async create(
     createSuppliersCategoryDto: CreateSuppliersCategoryDto,
   ): Promise<SuppliersCategory> {
-    return await this.prisma.suppliersCategory.create({
+    return await this.prismaService.suppliersCategory.create({
       data: createSuppliersCategoryDto,
     });
   }
@@ -41,7 +41,7 @@ export class SuppliersCategoryService {
     id: number,
     updateSuppliersCategoryDto: UpdateSuppliersCategoryDto,
   ): Promise<SuppliersCategory> {
-    return this.prisma.suppliersCategory.update({
+    return this.prismaService.suppliersCategory.update({
       data: updateSuppliersCategoryDto,
       where: {
         id,
@@ -50,7 +50,7 @@ export class SuppliersCategoryService {
   }
 
   async remove(id: number): Promise<SuppliersCategory> {
-    return this.prisma.suppliersCategory.delete({
+    return this.prismaService.suppliersCategory.delete({
       where: {
         id,
       },

@@ -18,7 +18,14 @@ export class ProductsCategoryService {
 
   async findAll() {
     return this.prismaService.productsCategory.findMany({
-      include: { subcategories: true },
+      include: {
+        parent: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
   }
 

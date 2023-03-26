@@ -9,6 +9,8 @@ export class ProductsService {
   constructor(protected readonly prismaService: PrismaService) {}
 
   create(createProductDto: CreateProductDto): Promise<Products> {
+    createProductDto.priceUpdatedAt = new Date();
+
     return this.prismaService.products.create({
       data: createProductDto,
     });

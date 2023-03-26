@@ -32,8 +32,7 @@ export class CreateProductDto {
   @IsNumber()
   price: number;
 
-  @IsNotEmpty()
-  @IsDate()
+  @IsOptional()
   priceUpdatedAt: Date;
 
   @IsNotEmpty()
