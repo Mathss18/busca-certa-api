@@ -9,7 +9,16 @@ export class SuppliersCategoryService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(): Promise<SuppliersCategory[]> {
-    return this.prisma.suppliersCategory.findMany();
+    return this.prisma.suppliersCategory.findMany({
+      include: {
+        parent: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
   }
 
   async findOne(id: number): Promise<SuppliersCategory> {
