@@ -8,14 +8,13 @@ import {
   Res,
   HttpStatus,
   Put,
-  UseGuards,
 } from '@nestjs/common';
 import { SuppliersService } from './suppliers.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { Response } from 'express';
 import { HttpReturn } from '../shared/http-response';
-import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
+import { Public } from '../decorators/public.decorator';
 
 @Controller('suppliers')
 export class SuppliersController {
@@ -39,7 +38,6 @@ export class SuppliersController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get()
   async findAll(@Res() res: Response) {
     try {

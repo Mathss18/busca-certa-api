@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { SuppliersCategory } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
+import { applyDefaultOrder } from '../utils/applyDefaultOrder';
 import { CreateSuppliersCategoryDto } from './dto/create-suppliers-category.dto';
 import { UpdateSuppliersCategoryDto } from './dto/update-suppliers-category.dto';
 
@@ -18,6 +19,7 @@ export class SuppliersCategoryService {
           },
         },
       },
+      orderBy: applyDefaultOrder(),
     });
   }
 

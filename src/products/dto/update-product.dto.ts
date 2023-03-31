@@ -32,8 +32,7 @@ export class UpdateProductDto {
   @IsNumber()
   price: number;
 
-  @IsNotEmpty()
-  @IsDate()
+  @IsOptional()
   priceUpdatedAt: Date;
 
   @IsNotEmpty()

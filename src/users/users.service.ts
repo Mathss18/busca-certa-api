@@ -4,6 +4,7 @@ import { PrismaService } from '../database/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
+import { applyDefaultOrder } from '../utils/applyDefaultOrder';
 
 @Injectable()
 export class UsersService {
@@ -23,7 +24,9 @@ export class UsersService {
   }
 
   findAll(): Promise<Users[]> {
-    return this.prismaService.users.findMany();
+    return this.prismaService.users.findMany({
+      orderBy: applyDefaultOrder(),
+    });
   }
 
   findOne(id: number): Promise<Users> {

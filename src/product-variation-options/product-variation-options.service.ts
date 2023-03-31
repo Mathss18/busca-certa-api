@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
+import { applyDefaultOrder } from '../utils/applyDefaultOrder';
 import { CreateProductVariationOptionDto } from './dto/create-product-variation-option.dto';
 import { UpdateProductVariationOptionDto } from './dto/update-product-variation-option.dto';
 
@@ -22,7 +23,9 @@ export class ProductVariationOptionsService {
   }
 
   findAll() {
-    return this.prismaService.productVariationOptions.findMany();
+    return this.prismaService.productVariationOptions.findMany({
+      orderBy: applyDefaultOrder(),
+    });
   }
 
   findOne(id: number) {

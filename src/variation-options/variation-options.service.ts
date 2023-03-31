@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { VariationOptions } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
+import { applyDefaultOrder } from '../utils/applyDefaultOrder';
 import { CreateVariationOptionDto } from './dto/create-variation-option.dto';
 import { UpdateVariationOptionDto } from './dto/update-variation-option.dto';
 
@@ -17,7 +18,9 @@ export class VariationOptionsService {
   }
 
   findAll(): Promise<VariationOptions[]> {
-    return this.prismaService.variationOptions.findMany();
+    return this.prismaService.variationOptions.findMany({
+      orderBy: applyDefaultOrder(),
+    });
   }
 
   findOne(id: number): Promise<VariationOptions> {

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Products } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
+import { applyDefaultOrder } from '../utils/applyDefaultOrder';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
@@ -27,6 +28,7 @@ export class ProductsService {
           },
         },
       },
+      orderBy: applyDefaultOrder(),
     });
   }
 
@@ -87,6 +89,7 @@ export class ProductsService {
                       },
                     },
                   },
+                  orderBy: applyDefaultOrder(),
                 },
               },
             },
