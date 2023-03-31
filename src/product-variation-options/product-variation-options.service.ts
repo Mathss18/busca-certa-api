@@ -7,7 +7,15 @@ import { UpdateProductVariationOptionDto } from './dto/update-product-variation-
 export class ProductVariationOptionsService {
   constructor(protected readonly prismaService: PrismaService) {}
 
-  create(createProductVariationOptionDto: CreateProductVariationOptionDto) {
+  async create(
+    createProductVariationOptionDto: CreateProductVariationOptionDto,
+  ) {
+    const exists = await this.validateDuplicatedRow(
+      createProductVariationOptionDto.productVariationId,
+      createProductVariationOptionDto.variationOptionId,
+    );
+    if (exists) throw new Error('Cannot link the same variation option twice.');
+
     return this.prismaService.productVariationOptions.create({
       data: createProductVariationOptionDto,
     });
@@ -43,5 +51,24 @@ export class ProductVariationOptionsService {
         id,
       },
     });
+  }
+
+  private async validateDuplicatedRow(
+    productVariationId: number,
+    variationOptionId: number,
+  ): Promise<boolean> {
+    const exists = await this.prismaService.productVariationOptions.findFirst({
+      select: {
+        id: true,
+      },
+      where: {
+        productVariationId,
+        variationOptionId,
+      },
+    });
+    if (exists) {
+      return true;
+    }
+    return false;
   }
 }

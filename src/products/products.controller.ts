@@ -100,4 +100,24 @@ export class ProductsController {
         .json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
+
+  @Get(':id/variations')
+  async findOneWithVariationsAndVariationOptions(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    try {
+      return res.status(HttpStatus.OK).json(
+        HttpReturn.build({
+          data: await this.productsService.findOneWithVariationsAndVariationOptions(
+            +id,
+          ),
+        }),
+      );
+    } catch (error) {
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(HttpReturn.build({ success: false, message: error.message }));
+    }
+  }
 }
