@@ -14,6 +14,7 @@ import { CreateProductsCategoryDto } from './dto/create-products-category.dto';
 import { UpdateProductsCategoryDto } from './dto/update-products-category.dto';
 import { Response } from 'express';
 import { HttpReturn } from '../shared/http-response';
+import { Public } from '../decorators/public.decorator';
 
 @Controller('products-category')
 export class ProductsCategoryController {
@@ -41,6 +42,7 @@ export class ProductsCategoryController {
     }
   }
 
+  @Public()
   @Get()
   async findAll(@Res() res: Response) {
     try {

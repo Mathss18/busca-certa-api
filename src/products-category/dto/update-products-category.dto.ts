@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUrl,
   MaxLength,
 } from 'class-validator';
 
@@ -12,6 +13,10 @@ export class UpdateProductsCategoryDto {
   @IsNotEmpty()
   @MaxLength(255)
   name: string;
+
+  @IsOptional()
+  @IsUrl()
+  image?: string;
 
   @IsNumber()
   @IsOptional()

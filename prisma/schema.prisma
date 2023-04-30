@@ -76,6 +76,7 @@ model Products {
 model ProductsCategory {
   id            Int                @id @default(autoincrement())
   name          String
+  image         String?
   parentId      Int?
   parent        ProductsCategory?  @relation("SubProductsCategory", fields: [parentId], references: [id])
   subcategories ProductsCategory[] @relation("SubProductsCategory")
