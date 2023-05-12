@@ -52,12 +52,39 @@ model SuppliersCategory {
   @@map("suppliers_categories")
 }
 
+model Features {
+  id              Int               @id @default(autoincrement())
+  name            String
+  icon            String
+  active          Boolean           @default(true)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  productFeatures ProductFeatures[]
+
+  @@map("features")
+}
+
+model ProductFeatures {
+  id         Int      @id @default(autoincrement())
+  productId  Int
+  product    Products @relation(fields: [productId], references: [id])
+  featuresId Int
+  features   Features @relation(fields: [featuresId], references: [id])
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("product_features")
+}
+
 model Products {
   id                 Int                 @id @default(autoincrement())
   name               String
-  description        String
-  sku                String?
+  subtitle           String
+  description        String              @db.Text
+  brand              String
   image              String?
+  rating             Int                 @default(5)
   price              Float
   priceUpdatedAt     DateTime
   supplierId         Int
@@ -69,6 +96,7 @@ model Products {
   updatedAt          DateTime            @updatedAt
   productsVariations ProductVariations[]
   basketDetails      BasketDetails[]
+  productFeatures    ProductFeatures[]
 
   @@map("products")
 }
@@ -185,12 +213,12 @@ model BasketVariations {
 }
 
 model Users {
-  id Int @id @default(autoincrement())
-  name String
-  email String @unique
-  password String
-  type String
-  active Boolean @default(true)
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  type      String
+  active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

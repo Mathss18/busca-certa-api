@@ -1,11 +1,14 @@
 import {
+  IsArray,
   IsBoolean,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   IsUrl,
+  Max,
   MaxLength,
+  Min,
 } from 'class-validator';
 
 export class CreateProductDto {
@@ -16,16 +19,27 @@ export class CreateProductDto {
 
   @IsNotEmpty()
   @IsString()
+  @MaxLength(255)
+  subtitle: string;
+
+  @IsNotEmpty()
+  @IsString()
   description: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   @MaxLength(255)
-  sku?: string;
+  brand: string;
 
   @IsOptional()
   @IsUrl()
   image?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(5)
+  rating?: number;
 
   @IsNotEmpty()
   @IsNumber()
@@ -41,6 +55,9 @@ export class CreateProductDto {
   @IsNotEmpty()
   @IsNumber()
   productCategoryId: number;
+
+  @IsArray()
+  productFeatures: number[];
 
   @IsOptional()
   @IsBoolean()

@@ -15,6 +15,7 @@ export class ProductVariationOptionsService {
       createProductVariationOptionDto.productVariationId,
       createProductVariationOptionDto.variationOptionId,
     );
+    console.log(exists);
     if (exists) throw new Error('Cannot link the same variation option twice.');
 
     return this.prismaService.productVariationOptions.create({

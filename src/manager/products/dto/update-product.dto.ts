@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsBoolean,
   IsDate,
   IsNotEmpty,
@@ -6,7 +7,9 @@ import {
   IsOptional,
   IsString,
   IsUrl,
+  Max,
   MaxLength,
+  Min,
 } from 'class-validator';
 
 export class UpdateProductDto {
@@ -19,10 +22,19 @@ export class UpdateProductDto {
   @IsString()
   description: string;
 
-  @IsOptional()
   @IsString()
   @MaxLength(255)
-  sku?: string;
+  subtitle: string;
+
+  @IsString()
+  @MaxLength(255)
+  brand: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(5)
+  rating?: number;
 
   @IsOptional()
   @IsUrl()
@@ -42,6 +54,9 @@ export class UpdateProductDto {
   @IsNotEmpty()
   @IsNumber()
   productCategoryId: number;
+
+  @IsArray()
+  productFeatures: number[];
 
   @IsOptional()
   @IsBoolean()

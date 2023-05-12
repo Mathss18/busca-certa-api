@@ -13,8 +13,9 @@ export class ProductRepository {
     const selectFields = {
       id: true,
       name: true,
-      description: true,
+      subtitle: true,
       image: true,
+      brand: true,
       supplier: {
         select: {
           companyName: true,
@@ -90,9 +91,23 @@ export class ProductRepository {
         id: true,
         name: true,
         image: true,
+        rating: true,
+        subtitle: true,
+        description: true,
         productCategory: true,
         supplier: true,
         productsVariations: this.selectProductVariations(),
+        productFeatures: {
+          select: {
+            features: {
+              select: {
+                id: true,
+                name: true,
+                icon: true,
+              },
+            },
+          },
+        },
       },
     });
   }

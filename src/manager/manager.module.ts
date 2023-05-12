@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthModule } from './auth/auth.module';
 import { AuthService } from './auth/auth.service';
 import { LocalStrategy } from './auth/strategies/local.strategy';
+import { FeaturesModule } from './features/features.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { LocalStrategy } from './auth/strategies/local.strategy';
     ProductVariationOptionsModule,
     AuthModule,
     UsersModule,
+    FeaturesModule,
   ],
   controllers: [],
   providers: [AuthService, JwtService, LocalStrategy],
