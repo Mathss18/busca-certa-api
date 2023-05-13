@@ -10,7 +10,7 @@ import {
 import { ProductService } from './product.service';
 import { Response } from 'express';
 import { HttpReturn } from '../../shared/http-response';
-import { SearchByTermDto } from './dto/product.dto';
+import { SearchByTermDto, SearchByTermPaginatedDto } from './dto/product.dto';
 
 @Controller('website/products')
 export class ProductController {
@@ -33,13 +33,33 @@ export class ProductController {
 
   @Post('search-by-term')
   async findProductByTerm(
-    @Body() productDto: SearchByTermDto,
+    @Body() productDto: SearchByTermPaginatedDto,
     @Res() res: Response,
   ) {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
           data: await this.productService.findProductByTerm(productDto),
+        }),
+      );
+    } catch (error) {
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(HttpReturn.build({ success: false, message: error.message }));
+    }
+  }
+
+  @Post('highlight-by-term')
+  async findHighlightProductByTerm(
+    @Body() productDto: SearchByTermDto,
+    @Res() res: Response,
+  ) {
+    try {
+      return res.status(HttpStatus.OK).json(
+        HttpReturn.build({
+          data: await this.productService.findHighlightProductByTerm(
+            productDto,
+          ),
         }),
       );
     } catch (error) {

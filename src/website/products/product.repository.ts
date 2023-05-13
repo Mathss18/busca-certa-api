@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { applyDefaultOrder } from '../../utils/applyDefaultOrder';
-import { SearchByTermDto } from './dto/product.dto';
+import { SearchByTermDto, SearchByTermPaginatedDto } from './dto/product.dto';
 
 @Injectable()
 export class ProductRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async findProductByTerm(params: SearchByTermDto) {
+  async findProductByTerm(params: SearchByTermPaginatedDto) {
     const skip = (params.page - 1) * params.pageSize;
 
     const selectFields = {
@@ -25,7 +25,7 @@ export class ProductRepository {
       productsVariations: this.selectProductVariations(),
     };
 
-    const searchTerm = params.term.toLowerCase(); // Convert search term to lowercase
+    const searchTerm = params.term.toLowerCase();
 
     const condition = {
       OR: [
@@ -81,6 +81,37 @@ export class ProductRepository {
     return { products, count };
   }
 
+  async findHighlightProductByTerm(params: SearchByTermDto) {
+    const selectFields = {
+      id: true,
+      name: true,
+      subtitle: true,
+      image: true,
+      brand: true,
+      rating: true,
+      productCategory: {
+        select: {
+          name: true,
+        },
+      },
+      supplier: {
+        select: {
+          companyName: true,
+          logo: true,
+        },
+      },
+      productsVariations: this.selectProductVariations(),
+    };
+
+    const searchTerm = params.term.toLowerCase();
+
+    return await this.prismaService.products.findFirst({
+      where: this.productsCondition(searchTerm),
+      select: selectFields,
+      orderBy: applyDefaultOrder('rating', 'desc'),
+    });
+  }
+
   async findOne(id: number) {
     return await this.prismaService.products.findFirst({
       where: {
@@ -94,7 +125,6 @@ export class ProductRepository {
         rating: true,
         subtitle: true,
         description: true,
-        productCategory: true,
         supplier: true,
         productsVariations: this.selectProductVariations(),
         productFeatures: {
@@ -140,6 +170,51 @@ export class ProductRepository {
           },
         },
       },
+    };
+  }
+
+  private productsCondition(searchTerm: string) {
+    return {
+      OR: [
+        {
+          name: {
+            contains: searchTerm,
+          },
+        },
+        {
+          supplier: {
+            OR: [
+              {
+                companyName: {
+                  contains: searchTerm,
+                },
+              },
+              {
+                tradingName: {
+                  contains: searchTerm,
+                },
+              },
+            ],
+          },
+        },
+        {
+          productCategory: {
+            name: {
+              contains: searchTerm,
+            },
+          },
+        },
+        {
+          productCategory: {
+            parent: {
+              name: {
+                contains: searchTerm,
+              },
+            },
+          },
+        },
+      ],
+      active: { equals: true },
     };
   }
 }
