@@ -11,12 +11,12 @@ import {
 export class CreateSupplierDto {
   @IsString()
   @IsNotEmpty()
-  @MaxLength(255)
+  @MaxLength(191)
   companyName: string;
 
   @IsString()
   @IsNotEmpty()
-  @MaxLength(255)
+  @MaxLength(191)
   tradingName: string;
 
   @IsString()

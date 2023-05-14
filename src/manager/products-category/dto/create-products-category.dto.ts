@@ -11,7 +11,7 @@ import {
 export class CreateProductsCategoryDto {
   @IsString()
   @IsNotEmpty()
-  @MaxLength(255)
+  @MaxLength(191)
   name: string;
 
   @IsOptional()

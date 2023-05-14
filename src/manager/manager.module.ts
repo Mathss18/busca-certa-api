@@ -13,6 +13,7 @@ import { AuthModule } from './auth/auth.module';
 import { AuthService } from './auth/auth.service';
 import { LocalStrategy } from './auth/strategies/local.strategy';
 import { FeaturesModule } from './features/features.module';
+import { KeywordsModule } from './keywords/keywords.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { FeaturesModule } from './features/features.module';
     AuthModule,
     UsersModule,
     FeaturesModule,
+    KeywordsModule,
   ],
   controllers: [],
   providers: [AuthService, JwtService, LocalStrategy],

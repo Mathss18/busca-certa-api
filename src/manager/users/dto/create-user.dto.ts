@@ -11,7 +11,7 @@ import {
 export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
-  @MaxLength(255)
+  @MaxLength(191)
   name: string;
 
   @IsNotEmpty()
@@ -20,7 +20,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsString()
-  @MaxLength(255)
+  @MaxLength(191)
   @Matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[-+_!@#$%^&*.,?]).{8,}$/, {
     message: 'Password is too weak',
   })
@@ -28,7 +28,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsString()
-  @MaxLength(255)
+  @MaxLength(191)
   type: string;
 
   @IsOptional()

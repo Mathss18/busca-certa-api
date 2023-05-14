@@ -9,7 +9,7 @@ import {
 export class UpdateFeatureDto {
   @IsNotEmpty()
   @IsString()
-  @MaxLength(255)
+  @MaxLength(191)
   name: string;
 
   @IsNotEmpty()

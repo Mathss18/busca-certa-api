@@ -10,7 +10,7 @@ import {
 export class CreateVariationOptionDto {
   @IsString()
   @IsNotEmpty()
-  @MaxLength(255)
+  @MaxLength(191)
   name: string;
 
   @IsNumber()

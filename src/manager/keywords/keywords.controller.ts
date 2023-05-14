@@ -1,22 +1,22 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Res, HttpStatus, UseGuards } from '@nestjs/common';
-import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { HttpReturn } from '../../shared/http-response';
+import { CreateKeywordDto } from './dto/create-keyword.dto';
+import { UpdateKeywordDto } from './dto/update-keyword.dto';
 import { Response } from 'express';
+import { HttpReturn } from '../../shared/http-response';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
+import { KeywordsService } from './keywords.service';
 
 @UseGuards(JwtAuthGuard)
-@Controller('manager/products')
-export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+@Controller('manager/keywords')
+export class KeywordsController {
+  constructor(private readonly keywordService: KeywordsService) {}
 
   @Post()
-  async create(@Body() createProductDto: CreateProductDto, @Res() res: Response) {
+  async create(@Body() createKeywordDto: CreateKeywordDto, @Res() res: Response) {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
-          data: await this.productsService.create(createProductDto),
+          data: await this.keywordService.create(createKeywordDto),
         }),
       );
     } catch (error) {
@@ -29,7 +29,7 @@ export class ProductsController {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
-          data: await this.productsService.findAll(),
+          data: await this.keywordService.findAll(),
         }),
       );
     } catch (error) {
@@ -42,7 +42,7 @@ export class ProductsController {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
-          data: await this.productsService.findOne(+id),
+          data: await this.keywordService.findOne(+id),
         }),
       );
     } catch (error) {
@@ -51,11 +51,11 @@ export class ProductsController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto, @Res() res: Response) {
+  async update(@Param('id') id: string, @Body() updateKeywordDto: UpdateKeywordDto, @Res() res: Response) {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
-          data: await this.productsService.update(+id, updateProductDto),
+          data: await this.keywordService.update(+id, updateKeywordDto),
         }),
       );
     } catch (error) {
@@ -68,20 +68,7 @@ export class ProductsController {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
-          data: await this.productsService.remove(+id),
-        }),
-      );
-    } catch (error) {
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
-    }
-  }
-
-  @Get(':id/variations')
-  async findOneWithVariationsAndVariationOptions(@Param('id') id: string, @Res() res: Response) {
-    try {
-      return res.status(HttpStatus.OK).json(
-        HttpReturn.build({
-          data: await this.productsService.findOneWithVariationsAndVariationOptions(+id),
+          data: await this.keywordService.remove(+id),
         }),
       );
     } catch (error) {

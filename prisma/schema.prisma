@@ -77,6 +77,30 @@ model ProductFeatures {
   @@map("product_features")
 }
 
+model Keywords {
+  id              Int               @id @default(autoincrement())
+  name            String            @unique
+  active          Boolean           @default(true)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  productKeywords ProductKeywords[]
+
+  @@map("keywords")
+}
+
+model ProductKeywords {
+  id         Int      @id @default(autoincrement())
+  productId  Int
+  product    Products @relation(fields: [productId], references: [id])
+  keywordId Int
+  keywords   Keywords @relation(fields: [keywordId], references: [id])
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("product_keywords")
+}
+
 model Products {
   id                 Int                 @id @default(autoincrement())
   name               String
@@ -98,6 +122,7 @@ model Products {
   basketDetails      BasketDetails[]
   productFeatures    ProductFeatures[]
   estimates          Estimate[]
+  productKeywords    ProductKeywords[]
 
   @@map("products")
 }
@@ -267,4 +292,6 @@ model Users {
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("users")
 }

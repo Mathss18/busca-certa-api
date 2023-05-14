@@ -11,15 +11,20 @@ export class ProductsService {
 
   async create(createProductDto: CreateProductDto): Promise<Products> {
     createProductDto.priceUpdatedAt = new Date();
+
     const productFeaturesIds = createProductDto.productFeatures;
+    const productKeywordsIds = createProductDto.productKeywords;
+
     delete createProductDto.productFeatures; // Remove productFeatures from DTO
+    delete createProductDto.productKeywords; // Remove productKeywords from DTO
 
     const product = await this.prismaService.products.create({
       data: createProductDto as any,
     });
 
-    // Create new productFeatures relations
+    // Create relations
     await this.createProductFeatures(product.id, productFeaturesIds);
+    await this.createProductKeywords(product.id, productKeywordsIds);
     return product;
   }
 
@@ -68,9 +73,7 @@ export class ProductsService {
     });
   }
 
-  async findOneWithVariationsAndVariationOptions(
-    id: number,
-  ): Promise<Products> {
+  async findOneWithVariationsAndVariationOptions(id: number): Promise<Products> {
     const product = await this.prismaService.products.findFirst({
       where: {
         id,
@@ -130,16 +133,26 @@ export class ProductsService {
             },
           },
         },
+        productKeywords: {
+          select: {
+            keywords: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
   }
 
-  async update(
-    id: number,
-    updateProductDto: UpdateProductDto,
-  ): Promise<Products> {
+  async update(id: number, updateProductDto: UpdateProductDto): Promise<Products> {
     const productFeaturesIds = updateProductDto.productFeatures;
+    const productKeywordsIds = updateProductDto.productKeywords;
+
     delete updateProductDto.productFeatures; // Remove productFeatures from DTO
+    delete updateProductDto.productKeywords; // Remove productkeywords from DTO
 
     // Update the product
     const updatedProduct = await this.prismaService.products.update({
@@ -147,11 +160,13 @@ export class ProductsService {
       data: updateProductDto as any,
     });
 
-    // Delete all existing productFeatures relations
+    // Delete all existing relations
     await this.deleteProductFeatures(id);
+    await this.deleteProductKeywords(id);
 
-    // Create new productFeatures relations
+    // Create new relations
     await this.createProductFeatures(id, productFeaturesIds);
+    await this.createProductKeywords(id, productKeywordsIds);
 
     return this.prismaService.products.findUnique({
       where: { id: updatedProduct.id },
@@ -180,6 +195,20 @@ export class ProductsService {
     );
   }
 
+  private async deleteProductKeywords(productId: number) {
+    const existingKeywords = await this.prismaService.productKeywords.findMany({
+      where: { productId },
+    });
+
+    await this.prismaService.$transaction(
+      existingKeywords.map((keyword) =>
+        this.prismaService.productKeywords.delete({
+          where: { id: keyword.id },
+        }),
+      ),
+    );
+  }
+
   private async createProductFeatures(productId: number, featureIds: number[]) {
     await this.prismaService.$transaction(
       featureIds.map((featureId) =>
@@ -187,6 +216,19 @@ export class ProductsService {
           data: {
             productId,
             featuresId: featureId,
+          },
+        }),
+      ),
+    );
+  }
+
+  private async createProductKeywords(productId: number, keywordsIds: number[]) {
+    await this.prismaService.$transaction(
+      keywordsIds.map((keywordId) =>
+        this.prismaService.productKeywords.create({
+          data: {
+            productId,
+            keywordId: keywordId,
           },
         }),
       ),

@@ -9,7 +9,7 @@ import {
 export class UpdateVariationDto {
   @IsString()
   @IsNotEmpty()
-  @MaxLength(255)
+  @MaxLength(191)
   name: string;
 
   @IsBoolean()

@@ -35,6 +35,11 @@ export class ProductRepository {
           },
         },
         {
+          brand: {
+            contains: searchTerm,
+          },
+        },
+        {
           supplier: {
             OR: [
               {
@@ -62,6 +67,17 @@ export class ProductRepository {
             parent: {
               name: {
                 contains: searchTerm,
+              },
+            },
+          },
+        },
+        {
+          productKeywords: {
+            some: {
+              keywords: {
+                name: {
+                  contains: searchTerm,
+                },
               },
             },
           },
@@ -126,6 +142,11 @@ export class ProductRepository {
         subtitle: true,
         description: true,
         supplier: true,
+        productCategory: {
+          select: {
+            name: true,
+          },
+        },
         productsVariations: this.selectProductVariations(),
         productFeatures: {
           select: {

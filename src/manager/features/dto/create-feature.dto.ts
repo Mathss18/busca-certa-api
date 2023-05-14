@@ -10,7 +10,7 @@ import {
 export class CreateFeatureDto {
   @IsNotEmpty()
   @IsString()
-  @MaxLength(255)
+  @MaxLength(191)
   name: string;
 
   @IsNotEmpty()

@@ -17,7 +17,6 @@ export class EstimatesController {
         }),
       );
     } catch (error) {
-      console.log(error.message);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
