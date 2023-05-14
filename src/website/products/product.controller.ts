@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpStatus,
-  Param,
-  Post,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Post, Res } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Response } from 'express';
 import { HttpReturn } from '../../shared/http-response';
@@ -25,17 +17,12 @@ export class ProductController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
   @Post('search-by-term')
-  async findProductByTerm(
-    @Body() productDto: SearchByTermPaginatedDto,
-    @Res() res: Response,
-  ) {
+  async findProductByTerm(@Body() productDto: SearchByTermPaginatedDto, @Res() res: Response) {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
@@ -43,29 +30,20 @@ export class ProductController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
   @Post('highlight-by-term')
-  async findHighlightProductByTerm(
-    @Body() productDto: SearchByTermDto,
-    @Res() res: Response,
-  ) {
+  async findHighlightProductByTerm(@Body() productDto: SearchByTermDto, @Res() res: Response) {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
-          data: await this.productService.findHighlightProductByTerm(
-            productDto,
-          ),
+          data: await this.productService.findHighlightProductByTerm(productDto),
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 }

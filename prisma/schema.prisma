@@ -97,6 +97,7 @@ model Products {
   productsVariations ProductVariations[]
   basketDetails      BasketDetails[]
   productFeatures    ProductFeatures[]
+  estimates          Estimate[]
 
   @@map("products")
 }
@@ -117,28 +118,30 @@ model ProductsCategory {
 }
 
 model Variations {
-  id                Int                 @id @default(autoincrement())
-  name              String              @unique
-  active            Boolean             @default(true)
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  variationsOptions VariationOptions[]
-  productsVariation ProductVariations[]
-  basketVariations  BasketVariations[]
+  id                        Int                        @id @default(autoincrement())
+  name                      String                     @unique
+  active                    Boolean                    @default(true)
+  createdAt                 DateTime                   @default(now())
+  updatedAt                 DateTime                   @updatedAt
+  variationsOptions         VariationOptions[]
+  productsVariation         ProductVariations[]
+  basketVariations          BasketVariations[]
+  estimateProductVariations EstimateProductVariation[]
 
   @@map("variations")
 }
 
 model VariationOptions {
-  id                       Int                       @id @default(autoincrement())
-  name                     String
-  variation                Variations                @relation(fields: [variationId], references: [id])
-  variationId              Int
-  active                   Boolean                   @default(true)
-  createdAt                DateTime                  @default(now())
-  updatedAt                DateTime                  @updatedAt
-  basketVariations         BasketVariations[]
-  productsVariationOptions ProductVariationOptions[]
+  id                        Int                        @id @default(autoincrement())
+  name                      String
+  variation                 Variations                 @relation(fields: [variationId], references: [id])
+  variationId               Int
+  active                    Boolean                    @default(true)
+  createdAt                 DateTime                   @default(now())
+  updatedAt                 DateTime                   @updatedAt
+  basketVariations          BasketVariations[]
+  productsVariationOptions  ProductVariationOptions[]
+  estimateProductVariations EstimateProductVariation[]
 
   @@map("variation_options")
 }
@@ -210,6 +213,49 @@ model BasketVariations {
   updatedAt           DateTime         @updatedAt
 
   @@map("basket_variations")
+}
+
+model Estimate {
+  id                        Int                        @id @default(autoincrement())
+  clientName                String
+  clientEmail               String
+  clientPhone               String
+  clientCompanyName         String
+  clientSegment             String?
+  clientFile                String?
+  clientMessage             String?                    @db.Text
+  productId                 Int
+  quantity                  Int
+  product                   Products                   @relation(fields: [productId], references: [id])
+  estimateInfoId            Int?
+  estimateInfo              EstimatesInfo?             @relation(fields: [estimateInfoId], references: [id])
+  estimateProductVariations EstimateProductVariation[]
+
+  @@map("estimates")
+}
+
+model EstimatesInfo {
+  id                   Int        @id @default(autoincrement())
+  estimateId           Int
+  sentClientEmail      DateTime?
+  sentSupplierEmail    DateTime?
+  sentClientWhatsapp   DateTime?
+  sentSupplierWhatsapp DateTime?
+  estimate             Estimate[]
+
+  @@map("estimates_info")
+}
+
+model EstimateProductVariation {
+  id                Int              @id @default(autoincrement())
+  estimateId        Int
+  variationId       Int
+  variationOptionId Int
+  estimate          Estimate         @relation(fields: [estimateId], references: [id])
+  variation         Variations       @relation(fields: [variationId], references: [id])
+  variationOption   VariationOptions @relation(fields: [variationOptionId], references: [id])
+
+  @@map("estimate_product_variations")
 }
 
 model Users {
