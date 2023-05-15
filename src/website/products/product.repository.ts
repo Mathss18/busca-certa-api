@@ -16,6 +16,7 @@ export class ProductRepository {
       subtitle: true,
       image: true,
       brand: true,
+      minimumToEstimate: true,
       supplier: {
         select: {
           companyName: true,
@@ -27,67 +28,9 @@ export class ProductRepository {
 
     const searchTerm = params.term.toLowerCase();
 
-    const condition = {
-      OR: [
-        {
-          name: {
-            contains: searchTerm,
-          },
-        },
-        {
-          brand: {
-            contains: searchTerm,
-          },
-        },
-        {
-          supplier: {
-            OR: [
-              {
-                companyName: {
-                  contains: searchTerm,
-                },
-              },
-              {
-                tradingName: {
-                  contains: searchTerm,
-                },
-              },
-            ],
-          },
-        },
-        {
-          productCategory: {
-            name: {
-              contains: searchTerm,
-            },
-          },
-        },
-        {
-          productCategory: {
-            parent: {
-              name: {
-                contains: searchTerm,
-              },
-            },
-          },
-        },
-        {
-          productKeywords: {
-            some: {
-              keywords: {
-                name: {
-                  contains: searchTerm,
-                },
-              },
-            },
-          },
-        },
-      ],
-      active: { equals: true },
-    };
-    const count = await this.prismaService.products.count({ where: condition });
+    const count = await this.prismaService.products.count({ where: this.productsCondition(searchTerm) });
     const products = await this.prismaService.products.findMany({
-      where: condition,
+      where: this.productsCondition(searchTerm),
       select: selectFields,
       take: params.pageSize,
       skip: skip,
@@ -230,6 +173,17 @@ export class ProductRepository {
             parent: {
               name: {
                 contains: searchTerm,
+              },
+            },
+          },
+        },
+        {
+          productKeywords: {
+            some: {
+              keywords: {
+                name: {
+                  contains: searchTerm,
+                },
               },
             },
           },

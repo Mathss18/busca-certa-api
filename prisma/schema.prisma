@@ -89,14 +89,14 @@ model Keywords {
 }
 
 model ProductKeywords {
-  id         Int      @id @default(autoincrement())
-  productId  Int
-  product    Products @relation(fields: [productId], references: [id])
+  id        Int      @id @default(autoincrement())
+  productId Int
+  product   Products @relation(fields: [productId], references: [id])
   keywordId Int
-  keywords   Keywords @relation(fields: [keywordId], references: [id])
-  active     Boolean  @default(true)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  keywords  Keywords @relation(fields: [keywordId], references: [id])
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("product_keywords")
 }
@@ -109,6 +109,7 @@ model Products {
   brand              String
   image              String?
   rating             Int                 @default(5)
+  minimumToEstimate  Int                 @default(1)
   price              Float
   priceUpdatedAt     DateTime
   supplierId         Int
