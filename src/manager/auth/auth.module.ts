@@ -18,13 +18,7 @@ import { UsersService } from '../../manager/users/users.service';
       signOptions: { expiresIn: '7d' },
     }),
   ],
-  providers: [
-    AuthService,
-    UsersService,
-    PrismaService,
-    JwtStrategy,
-    LocalStrategy,
-  ],
+  providers: [AuthService, UsersService, PrismaService, JwtStrategy, LocalStrategy],
   exports: [AuthService],
   controllers: [AuthController],
 })

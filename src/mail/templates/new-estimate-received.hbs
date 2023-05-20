@@ -80,19 +80,18 @@
   </head>
   <body>
     <div class="email-container">
-      <div class="email-header">Novo Orçamento Recebido</div>
+      <div class="email-header">Recebemos Seu Orçamento</div>
       <div class="email-content">
+        <h3>Orçamento n° #<b>{{estimateId}}</b></h3>
         <p>Olá {{supplierName}},</p>
         <p>
-          É com prazer que informamos que um novo orçamento foi feito pelo nosso
-          cliente <b>{{clientName}}</b>. Aqui estão os detalhes do produto
-          cotado:
+          Temos ótimas notícias! Recebemos um novo pedido de orçamento do nosso cliente <b>{{clientName}}</b>. Aqui estão os detalhes:
         </p>
         <!-- Repita esta seção para cada produto -->
         <div class="product-card">
           <img src="{{productImage}}" alt="{{productName}}" />
           <div>
-            <strong>{{productName}}</strong><br />
+            <strong>{{productName}} - {{productSubtitle}}</strong><br />
             Quantidade: {{quantity}}<br />
             <ul>
               {{#each this.variations}}
@@ -102,13 +101,12 @@
           </div>
         </div>
         <!-- Fim da seção de produtos -->
-        <p>O cliente deixou a seguinte mensagem:</p>
+        <p>O cliente adicionou a seguinte mensagem:</p>
         <div class="client-message">{{clientMessage}}</div>
         <p>
-          Por favor, revise o orçamento e nos informe se há algum problema ou
-          preocupação.
+          Por favor, Responda o orçamento e nos avise se há algum problema ou algo que devemos saber.
         </p>
-        <a href="{{reviewLink}}" class="cta-button">Revisar Orçamento</a>
+        <a href="{{reviewLink}}" class="cta-button">Responder Orçamento</a>
       </div>
       <div class="email-footer">
         <p>Atenciosamente,<br />Facilite</p>

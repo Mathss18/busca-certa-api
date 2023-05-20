@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
-import { CreateEstimateDto, CreateEstimateProductVariationDto, CreateEstimatesInfoDto } from './dto/estimate.dto';
+import { v4 as uuid } from 'uuid';
+import { CreateEstimateDto, CreateEstimateProductVariationDto } from './dto/estimate.dto';
+import { EstimateStatuses } from './enum/estimate-statuses.enum';
 
 @Injectable()
 export class EstimateRepository {
@@ -16,19 +18,30 @@ export class EstimateRepository {
       // 2. Create estimate products variations
       await this.createEstimateProductsVariations(estimate.id, params.estimateProductVariations);
 
-      // 3. Create estimate info
-      const estimateInfo = await this.createEstimateInfo({
-        estimateId: estimate.id,
-        sentClientEmail: null,
-        sentSupplierEmail: null,
-        sentClientWhatsapp: null,
-        sentSupplierWhatsapp: null,
-      });
+      return estimate;
+    });
+  }
 
-      // 4. Update estimate with info id
-      const updatedEstimate = await this.updateEstimateWithInfoId(estimate.id, estimateInfo.id);
+  async accept(id: number, status: EstimateStatuses, price: number) {
+    return this.prismaService.estimate.update({
+      where: {
+        id,
+      },
+      data: {
+        status: status,
+        price: price,
+      },
+    });
+  }
 
-      return updatedEstimate;
+  async decline(id: number, status: EstimateStatuses) {
+    return this.prismaService.estimate.update({
+      where: {
+        id,
+      },
+      data: {
+        status: status,
+      },
     });
   }
 
@@ -38,12 +51,63 @@ export class EstimateRepository {
         id,
       },
       include: {
-        estimateInfo: true,
         product: {
           select: {
             id: true,
             name: true,
             image: true,
+            subtitle: true,
+            supplier: {
+              select: {
+                id: true,
+                companyName: true,
+                email: true,
+                mobileNumber: true,
+              },
+            },
+          },
+        },
+        estimateProductVariations: {
+          select: {
+            variation: {
+              select: {
+                name: true,
+              },
+            },
+            variationOption: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async getIdByNonce(nonce: string) {
+    return this.prismaService.estimate.findFirstOrThrow({
+      where: {
+        nonce,
+      },
+      select: {
+        id: true,
+      },
+    });
+  }
+
+  async getOneByNonce(nonce: string) {
+    return this.prismaService.estimate.findFirstOrThrow({
+      where: {
+        nonce,
+      },
+      include: {
+        product: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+            subtitle: true,
             supplier: {
               select: {
                 id: true,
@@ -82,6 +146,7 @@ export class EstimateRepository {
         clientFile: params.clientFile,
         clientMessage: params.clientMessage,
         quantity: params.quantity,
+        nonce: uuid(),
         product: {
           connect: {
             id: params.productId,
@@ -98,25 +163,6 @@ export class EstimateRepository {
         variationId: variation.variationId,
         variationOptionId: variation.variationOptionId,
       })),
-    });
-  }
-
-  private async createEstimateInfo(estimateInfo: CreateEstimatesInfoDto) {
-    return this.prismaTransaction.estimatesInfo.create({
-      data: {
-        estimateId: estimateInfo.estimateId,
-        sentClientEmail: estimateInfo.sentClientEmail,
-        sentSupplierEmail: estimateInfo.sentSupplierEmail,
-        sentClientWhatsapp: estimateInfo.sentClientWhatsapp,
-        sentSupplierWhatsapp: estimateInfo.sentSupplierWhatsapp,
-      },
-    });
-  }
-
-  private async updateEstimateWithInfoId(estimateId: number, infoId: number) {
-    return this.prismaTransaction.estimate.update({
-      where: { id: estimateId },
-      data: { estimateInfoId: infoId },
     });
   }
 }

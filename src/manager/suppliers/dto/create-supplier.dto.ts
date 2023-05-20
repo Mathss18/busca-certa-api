@@ -1,12 +1,4 @@
-import {
-  IsBoolean,
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUrl,
-  MaxLength,
-} from 'class-validator';
+import { IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsString, IsUrl, MaxLength } from 'class-validator';
 
 export class CreateSupplierDto {
   @IsString()
@@ -47,6 +39,7 @@ export class CreateSupplierDto {
   description: string;
 
   @IsOptional()
+  @IsUrl()
   logo?: string;
 
   @IsString()

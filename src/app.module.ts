@@ -6,6 +6,9 @@ import { WebsiteModule } from './website/website.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MailModule } from './mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
+import { WhatsappModule } from './whatsapp/whatsapp.module';
+import { S3Module } from './aws/s3/s3.module';
+import configuration from './config/configuration';
 
 @Module({
   imports: [
@@ -15,7 +18,10 @@ import { ConfigModule } from '@nestjs/config';
     MailModule,
     ConfigModule.forRoot({
       isGlobal: true,
+      load: [configuration],
     }),
+    WhatsappModule,
+    S3Module,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,19 +1,30 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Res, HttpStatus, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Res, HttpStatus, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { HttpReturn } from '../../shared/http-response';
 import { Response } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { S3Service } from '../../aws/s3/s3.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('manager/products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly productsService: ProductsService, private readonly s3Service: S3Service) {}
 
   @Post()
-  async create(@Body() createProductDto: CreateProductDto, @Res() res: Response) {
+  @UseInterceptors(FileInterceptor('image'))
+  async create(
+    @UploadedFile()
+    image: Express.Multer.File,
+    @Body() createProductDto: CreateProductDto,
+    @Res() res: Response,
+  ) {
     try {
+      const extension = image.mimetype.split('/')[1];
+      const fileName = `${createProductDto.name}-${createProductDto.supplierId}-product.${extension}`;
+      createProductDto.image = await this.s3Service.upload(fileName, image.buffer);
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
           data: await this.productsService.create(createProductDto),
@@ -51,8 +62,20 @@ export class ProductsController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto, @Res() res: Response) {
+  @UseInterceptors(FileInterceptor('image'))
+  async update(
+    @UploadedFile()
+    image: Express.Multer.File,
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+    @Res() res: Response,
+  ) {
     try {
+      if (image) {
+        const extension = image.mimetype.split('/')[1];
+        const fileName = `${updateProductDto.name}-${updateProductDto.supplierId}-product.${extension}`;
+        updateProductDto.image = await this.s3Service.upload(fileName, image.buffer);
+      }
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
           data: await this.productsService.update(+id, updateProductDto),

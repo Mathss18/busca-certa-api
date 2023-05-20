@@ -72,7 +72,7 @@ export class ProductRepository {
   }
 
   async findOne(id: number) {
-    return await this.prismaService.products.findFirst({
+    return await this.prismaService.products.findFirstOrThrow({
       where: {
         id,
         active: { equals: true },
@@ -85,6 +85,7 @@ export class ProductRepository {
         subtitle: true,
         description: true,
         supplier: true,
+        minimumToEstimate: true,
         productCategory: {
           select: {
             name: true,

@@ -18,6 +18,7 @@ export class ProductsService {
     delete createProductDto.productFeatures; // Remove productFeatures from DTO
     delete createProductDto.productKeywords; // Remove productKeywords from DTO
 
+    console.log(typeof createProductDto.price);
     const product = await this.prismaService.products.create({
       data: createProductDto as any,
     });

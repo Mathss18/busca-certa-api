@@ -1,12 +1,5 @@
-import {
-  IsBoolean,
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUrl,
-  MaxLength,
-} from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsString, IsUrl, MaxLength } from 'class-validator';
 
 export class UpdateSupplierDto {
   @IsString()
@@ -68,6 +61,11 @@ export class UpdateSupplierDto {
   zipCode: string;
 
   @IsBoolean()
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
+  })
   @IsOptional()
   active?: boolean;
 }

@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString, ValidateNested, IsEmail } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsString, ValidateNested, IsEmail, IsDecimal, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateEstimateProductVariationDto {
@@ -10,25 +10,6 @@ export class CreateEstimateProductVariationDto {
   @IsInt()
   variationOptionId: number;
 }
-
-export class CreateEstimatesInfoDto {
-  @IsNotEmpty()
-  @IsInt()
-  estimateId: number;
-
-  @IsNotEmpty()
-  sentClientEmail: Date | null;
-
-  @IsNotEmpty()
-  sentSupplierEmail: Date | null;
-
-  @IsNotEmpty()
-  sentClientWhatsapp: Date | null;
-
-  @IsNotEmpty()
-  sentSupplierWhatsapp: Date | null;
-}
-
 export class CreateEstimateDto {
   @IsNotEmpty()
   @IsString()
@@ -69,4 +50,34 @@ export class CreateEstimateDto {
   @ValidateNested({ each: true })
   @Type(() => CreateEstimateProductVariationDto)
   estimateProductVariations?: CreateEstimateProductVariationDto[];
+}
+
+export class AcceptEstimateDto {
+  @IsNotEmpty()
+  @IsString()
+  nonce: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  price: number;
+}
+
+export class DeclineEstimateDto {
+  @IsNotEmpty()
+  @IsString()
+  nonce: string;
+
+  @IsNotEmpty()
+  @IsString()
+  reason: string;
+}
+
+export class AskForHelpWithEstimateDto {
+  @IsNotEmpty()
+  @IsString()
+  nonce: string;
+
+  @IsNotEmpty()
+  @IsString()
+  reason: string;
 }

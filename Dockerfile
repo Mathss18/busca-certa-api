@@ -4,7 +4,7 @@ RUN npm i -g @nestjs/cli
 WORKDIR /node_app
 COPY package.json ./
 COPY package-lock.json ./
-RUN npm cache clean --force
+# RUN npm cache clean --force
 RUN npm install
 RUN chmod -R 777 ./node_modules
 

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f4f4f4;
+      }
+      .product-card {
+        display: flex;
+        margin-bottom: 20px;
+        padding: 20px;
+        border: 1px solid #dddddd;
+        border-radius: 5px;
+      }
+      .product-card img {
+        width: 120px;
+        border-radius: 10px;
+        margin-right: 30px;
+      }
+      .product-card div {
+        line-height: 1.2;
+      }
+      .product-card ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      .email-container {
+        width: 100%;
+        max-width: 700px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .email-header {
+        background: url("https://static.vecteezy.com/system/resources/previews/002/292/582/original/elegant-black-and-gold-banner-background-free-vector.jpg") no-repeat;
+        background-color: #777777;
+        background-size: cover;
+        padding: 30px;
+        color: white;
+        text-align: center;
+        font-size: 2em;
+      }
+      .email-content {
+        padding: 30px;
+        color: #444444;
+        line-height: 1.5em;
+      }
+      .email-content p {
+        margin-bottom: 20px;
+      }
+      .email-footer {
+        padding: 30px;
+        text-align: center;
+        color: #777777;
+        background: #f4f4f4;
+        font-size: 0.8em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <div class="email-header">Atualização do Orçamento</div>
+      <div class="email-content">
+        <h3>Orçamento n° #<b>{{estimateId}}</b></h3>
+        <p>Olá {{supplierName}},</p>
+        <p>
+          Notamos que você recusou o pedido de orçamento do cliente <b>{{clientName}}</b>. O cliente já foi notificado sobre sua decisão.
+        </p>
+         <!-- Repita esta seção para cada produto -->
+        <div class="product-card">
+          <img src="{{productImage}}" alt="{{productName}}" />
+          <div>
+            <strong>{{productName}} - {{productSubtitle}}</strong><br />
+            Quantidade: {{quantity}}<br />
+            <ul>
+              {{#each this.variations}}
+                <li>{{this.variation}}: {{this.variationOption}}</li>
+              {{/each}}
+            </ul>
+            <h4 style="color: firebrick;">Não houve proposta.</h4>
+          </div>
+        </div>
+        <!-- Fim da seção de produtos -->
+        <p>Compreendemos que às vezes pode ser necessário recusar um orçamento, mas queremos lembrar que aceitar orçamentos geralmente resulta em uma experiência mais positiva para ambos os lados. Sempre que possível, recomendamos a aceitação de orçamentos para facilitar uma relação de negócios saudável e produtiva.</p>
+        <p>Estamos aqui para apoiá-lo em qualquer situação. Se você tiver alguma dúvida ou preocupação, não hesite em entrar em contato conosco.</p>
+      </div>
+      <div class="email-footer">
+        <p>Atenciosamente,<br />Facilite</p>
+      </div>
+    </div>
+  </body>
+</html>

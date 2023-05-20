@@ -29,10 +29,7 @@ export class SuppliersService {
     });
   }
 
-  async update(
-    id: number,
-    updateSupplierDto: UpdateSupplierDto,
-  ): Promise<Supplier> {
+  async update(id: number, updateSupplierDto: UpdateSupplierDto): Promise<Supplier> {
     return this.prisma.supplier.update({
       data: updateSupplierDto,
       where: {

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f4f4f4;
+      }
+      .product-card {
+        display: flex;
+        margin-bottom: 20px;
+        padding: 20px;
+        border: 1px solid #dddddd;
+        border-radius: 5px;
+      }
+      .product-card img {
+        width: 120px;
+        border-radius: 10px;
+        margin-right: 30px;
+      }
+      .product-card div {
+        line-height: 1.2;
+      }
+      .product-card ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      .email-container {
+        width: 100%;
+        max-width: 700px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .email-header {
+        background: url("https://static.vecteezy.com/system/resources/previews/002/292/582/original/elegant-black-and-gold-banner-background-free-vector.jpg") no-repeat;
+        background-color: #777777;
+        background-size: cover;
+        padding: 30px;
+        color: white;
+        text-align: center;
+        font-size: 2em;
+      }
+      .email-content {
+        padding: 30px;
+        color: #444444;
+        line-height: 1.5em;
+      }
+      .email-content p {
+        margin-bottom: 20px;
+      }
+      .email-footer {
+        padding: 30px;
+        text-align: center;
+        color: #777777;
+        background: #f4f4f4;
+        font-size: 0.8em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <div class="email-header">Seu Pedido de Orçamento Está a Caminho</div>
+      <div class="email-content">
+        <h3>Orçamento n° #<b>{{estimateId}}</b></h3>
+        <p>Olá {{clientName}},</p>
+        <p>
+          Seu pedido de orçamento já está nas mãos do nosso fornecedor <b>{{supplierName}}</b>. Eles irão revisar os detalhes e entrar em contato em breve.
+        </p>
+        <!-- Repita esta seção para cada produto -->
+        <div class="product-card">
+          <img src="{{productImage}}" alt="{{productName}}" />
+          <div>
+            <strong>{{productName}} - {{productSubtitle}}</strong><br />
+            Quantidade: {{quantity}}<br />
+            <ul>
+              {{#each this.variations}}
+                <li>{{this.variation}}: {{this.variationOption}}</li>
+              {{/each}}
+            </ul>
+          </div>
+        </div>
+        <!-- Fim da seção de produtos -->
+        <p>Por favor, aguarde enquanto o fornecedor revisa o seu pedido. Vamos mantê-lo atualizado sobre qualquer novidade.</p>
+        <p>
+          Caso tenha alguma dúvida ou precise ajustar o seu pedido, sinta-se à vontade para nos contatar a qualquer momento.
+        </p>
+      </div>
+      <div class="email-footer">
+        <p>Atenciosamente,<br />Facilite</p>
+      </div>
+    </div>
+  </body>
+</html>

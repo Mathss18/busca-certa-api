@@ -21,7 +21,7 @@ model Supplier {
   segment            String
   website            String?
   description        String?
-  logo               String?
+  logo               String
   street             String
   number             String
   neighborhood       String
@@ -107,7 +107,7 @@ model Products {
   subtitle           String
   description        String              @db.Text
   brand              String
-  image              String?
+  image              String
   rating             Int                 @default(5)
   minimumToEstimate  Int                 @default(1)
   price              Float
@@ -120,7 +120,6 @@ model Products {
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
   productsVariations ProductVariations[]
-  basketDetails      BasketDetails[]
   productFeatures    ProductFeatures[]
   estimates          Estimate[]
   productKeywords    ProductKeywords[]
@@ -151,7 +150,6 @@ model Variations {
   updatedAt                 DateTime                   @updatedAt
   variationsOptions         VariationOptions[]
   productsVariation         ProductVariations[]
-  basketVariations          BasketVariations[]
   estimateProductVariations EstimateProductVariation[]
 
   @@map("variations")
@@ -165,7 +163,6 @@ model VariationOptions {
   active                    Boolean                    @default(true)
   createdAt                 DateTime                   @default(now())
   updatedAt                 DateTime                   @updatedAt
-  basketVariations          BasketVariations[]
   productsVariationOptions  ProductVariationOptions[]
   estimateProductVariations EstimateProductVariation[]
 
@@ -199,48 +196,6 @@ model ProductVariationOptions {
   @@map("product_variation_options")
 }
 
-model Baskets {
-  id            Int             @id @default(autoincrement())
-  customerId    Int
-  basketDetails BasketDetails[]
-  active        Boolean         @default(true)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-
-  @@map("baskets")
-}
-
-model BasketDetails {
-  id               Int                @id @default(autoincrement())
-  basketId         Int
-  basket           Baskets            @relation(fields: [basketId], references: [id])
-  productsId       Int
-  product          Products           @relation(fields: [productsId], references: [id])
-  quantity         Float
-  itemNumber       Int
-  basketVariations BasketVariations[]
-  active           Boolean            @default(true)
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-
-  @@map("basket_details")
-}
-
-model BasketVariations {
-  id                  Int              @id @default(autoincrement())
-  basketDetailsId     Int
-  basketDetails       BasketDetails    @relation(fields: [basketDetailsId], references: [id])
-  variationsId        Int
-  variation           Variations       @relation(fields: [variationsId], references: [id])
-  variationsOptionsId Int
-  variationOption     VariationOptions @relation(fields: [variationsOptionsId], references: [id])
-  active              Boolean          @default(true)
-  createdAt           DateTime         @default(now())
-  updatedAt           DateTime         @updatedAt
-
-  @@map("basket_variations")
-}
-
 model Estimate {
   id                        Int                        @id @default(autoincrement())
   clientName                String
@@ -252,24 +207,30 @@ model Estimate {
   clientMessage             String?                    @db.Text
   productId                 Int
   quantity                  Int
+  price                     Decimal                    @db.Decimal(9,2) @default(0)
   product                   Products                   @relation(fields: [productId], references: [id])
-  estimateInfoId            Int?
-  estimateInfo              EstimatesInfo?             @relation(fields: [estimateInfoId], references: [id])
   estimateProductVariations EstimateProductVariation[]
+  nonce                     String                     @unique
+  status                    String                     @default("pending")
+  active                    Boolean                    @default(true)
+  createdAt                 DateTime                   @default(now())
+  updatedAt                 DateTime                   @updatedAt
+  EstimateTimeline          EstimateTimeline[]
 
   @@map("estimates")
 }
 
-model EstimatesInfo {
-  id                   Int        @id @default(autoincrement())
-  estimateId           Int
-  sentClientEmail      DateTime?
-  sentSupplierEmail    DateTime?
-  sentClientWhatsapp   DateTime?
-  sentSupplierWhatsapp DateTime?
-  estimate             Estimate[]
+model EstimateTimeline {
+  id         Int      @id @default(autoincrement())
+  estimate   Estimate @relation(fields: [estimateId], references: [id])
+  estimateId Int
+  message    String?
+  code       Int
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  @@map("estimates_info")
+  @@map("estimates_timeline")
 }
 
 model EstimateProductVariation {
@@ -280,6 +241,9 @@ model EstimateProductVariation {
   estimate          Estimate         @relation(fields: [estimateId], references: [id])
   variation         Variations       @relation(fields: [variationId], references: [id])
   variationOption   VariationOptions @relation(fields: [variationOptionId], references: [id])
+  active            Boolean          @default(true)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 
   @@map("estimate_product_variations")
 }

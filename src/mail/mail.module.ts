@@ -11,16 +11,16 @@ import { ConfigService } from '@nestjs/config';
     MailerModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
         transport: {
-          host: config.get('MAIL_HOST'),
-          port: config.get('MAIL_PORT'),
+          host: config.get('mail.host'),
+          port: config.get('mail.port'),
           // secure: false,
           auth: {
-            user: config.get('MAIL_USER'),
-            pass: config.get('MAIL_PASSWORD'),
+            user: config.get('mail.user'),
+            pass: config.get('mail.password'),
           },
         },
         defaults: {
-          from: `"Não Responda" <${config.get('MAIL_FROM')}>`,
+          from: `"Não Responda" <${config.get('mail.from')}>`,
         },
         template: {
           dir: join(__dirname, 'templates'),
