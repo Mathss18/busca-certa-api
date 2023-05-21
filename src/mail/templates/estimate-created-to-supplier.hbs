@@ -103,6 +103,9 @@
         <!-- Fim da seção de produtos -->
         <p>O cliente adicionou a seguinte mensagem:</p>
         <div class="client-message">{{clientMessage}}</div>
+        {{#if clientFile}}
+          <p>O cliente anexou um arquivo, portanto não se esqueça de conferi-lo.</p>
+        {{/if}}
         <p>
           Por favor, Responda o orçamento e nos avise se há algum problema ou algo que devemos saber.
         </p>

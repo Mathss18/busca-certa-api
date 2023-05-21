@@ -1,5 +1,5 @@
 import { IsInt, IsNotEmpty, IsOptional, IsString, ValidateNested, IsEmail, IsDecimal, IsNumber } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class CreateEstimateProductVariationDto {
   @IsNotEmpty()
@@ -39,14 +39,20 @@ export class CreateEstimateDto {
   clientMessage?: string;
 
   @IsNotEmpty()
+  @Transform(({ value }) => Number(value))
   @IsInt()
   productId: number;
 
   @IsNotEmpty()
+  @Transform(({ value }) => Number(value))
   @IsInt()
   quantity: number;
 
   @IsOptional()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') return JSON.parse(value);
+    return value;
+  })
   @ValidateNested({ each: true })
   @Type(() => CreateEstimateProductVariationDto)
   estimateProductVariations?: CreateEstimateProductVariationDto[];

@@ -45,26 +45,38 @@ export class EstimateCreatedListener {
   }
 
   private sendEmailToSupplier(estimate) {
-    const { id, clientName, product, quantity, clientMessage, estimateProductVariations, nonce } = estimate;
+    const { id, clientName, product, quantity, clientMessage, estimateProductVariations, nonce, clientFile } = estimate;
+
+    const attachments = [{ url: clientFile }] ?? null;
+
+    const data = {
+      estimateId: id,
+      supplierName: product.supplier.companyName,
+      clientName: clientName,
+      productName: product.name,
+      productSubtitle: product.subtitle,
+      productImage: product.image,
+      quantity: quantity,
+      variations: estimateProductVariations.map((variation) => {
+        return {
+          variation: variation.variation.name,
+          variationOption: variation.variationOption.name,
+        };
+      }),
+      clientFile: !!clientFile,
+      clientMessage: clientMessage,
+      reviewLink: `${this.configService.get('websiteUrl')}/estimates/review?nonce=${nonce}`,
+    };
 
     try {
-      this.mailService.sendEmailWithTemplate(product.supplier.email, 'Orçamento Recebido!', './new-estimate-received', {
-        estimateId: id,
-        supplierName: product.supplier.companyName,
-        clientName: clientName,
-        productName: product.name,
-        productSubtitle: product.subtitle,
-        productImage: product.image,
-        quantity: quantity,
-        variations: estimateProductVariations.map((variation) => {
-          return {
-            variation: variation.variation.name,
-            variationOption: variation.variationOption.name,
-          };
-        }),
-        clientMessage: clientMessage,
-        reviewLink: `${this.configService.get('websiteUrl')}/estimates/review?nonce=${nonce}`,
-      });
+      this.mailService.sendEmailWithTemplate(
+        product.supplier.email,
+        'Orçamento Recebido!',
+        './estimate-created-to-supplier',
+        data,
+        undefined,
+        attachments,
+      );
     } catch (error) {}
   }
 
@@ -110,7 +122,7 @@ export class EstimateCreatedListener {
     const { id, clientName, clientEmail, product, quantity, estimateProductVariations } = estimate;
 
     try {
-      this.mailService.sendEmailWithTemplate(clientEmail, 'Orçamento Enviado!', './new-estimate-sent', {
+      this.mailService.sendEmailWithTemplate(clientEmail, 'Orçamento Enviado!', './estimate-created-to-client', {
         estimateId: id,
         supplierName: product.supplier.companyName,
         clientName: clientName,

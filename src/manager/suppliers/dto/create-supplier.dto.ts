@@ -38,9 +38,8 @@ export class CreateSupplierDto {
   @IsString()
   description: string;
 
-  @IsOptional()
   @IsUrl()
-  logo?: string;
+  logo: string;
 
   @IsString()
   street: string;

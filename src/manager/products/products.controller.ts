@@ -21,9 +21,9 @@ export class ProductsController {
     @Body() createProductDto: CreateProductDto,
     @Res() res: Response,
   ) {
+    const extension = image.mimetype.split('/')[1];
+    const fileName = `${createProductDto.name}-${createProductDto.supplierId}-product.${extension}`;
     try {
-      const extension = image.mimetype.split('/')[1];
-      const fileName = `${createProductDto.name}-${createProductDto.supplierId}-product.${extension}`;
       createProductDto.image = await this.s3Service.upload(fileName, image.buffer);
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
@@ -31,6 +31,7 @@ export class ProductsController {
         }),
       );
     } catch (error) {
+      this.s3Service.delete(fileName);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
