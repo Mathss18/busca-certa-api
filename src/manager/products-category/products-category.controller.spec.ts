@@ -44,9 +44,7 @@ describe('ProductsCartegoryController', () => {
       ],
     }).compile();
 
-    controller = module.get<ProductsCategoryController>(
-      ProductsCategoryController,
-    );
+    controller = module.get<ProductsCategoryController>(ProductsCategoryController);
   });
 
   it('should be defined', () => {
@@ -94,11 +92,7 @@ describe('ProductsCartegoryController', () => {
 
   describe('update a product category', () => {
     it('should update a product category', async () => {
-      const result: any = await controller.update(
-        '1',
-        modifiedProductCategory,
-        res,
-      );
+      const result: any = await controller.update('1', modifiedProductCategory, res);
       expect(result).toStrictEqual({
         data: modifiedProductCategory,
         message: '',

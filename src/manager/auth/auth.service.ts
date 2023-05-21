@@ -14,7 +14,7 @@ export class AuthService {
     if (!user.active) return null;
 
     if (user && bcrypt.compareSync(password, user.password)) {
-      const { password, ...result } = user;
+      const { ...result } = user;
       return result;
     }
     return null;

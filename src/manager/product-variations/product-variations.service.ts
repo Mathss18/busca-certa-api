@@ -9,13 +9,8 @@ import { UpdateProductVariationDto } from './dto/update-product-variation.dto';
 export class ProductVariationsService {
   constructor(protected readonly prismaService: PrismaService) {}
 
-  async create(
-    createProductVariationDto: CreateProductVariationDto,
-  ): Promise<ProductVariations> {
-    const exists = await this.validateDuplicatedRow(
-      createProductVariationDto.productId,
-      createProductVariationDto.variationId,
-    );
+  async create(createProductVariationDto: CreateProductVariationDto): Promise<ProductVariations> {
+    const exists = await this.validateDuplicatedRow(createProductVariationDto.productId, createProductVariationDto.variationId);
     if (exists) throw new Error('Cannot link the same variation option twice.');
 
     return this.prismaService.productVariations.create({
@@ -37,10 +32,7 @@ export class ProductVariationsService {
     });
   }
 
-  update(
-    id: number,
-    updateProductVariationDto: UpdateProductVariationDto,
-  ): Promise<ProductVariations> {
+  update(id: number, updateProductVariationDto: UpdateProductVariationDto): Promise<ProductVariations> {
     return this.prismaService.productVariations.update({
       where: {
         id,
@@ -57,10 +49,7 @@ export class ProductVariationsService {
     });
   }
 
-  private async validateDuplicatedRow(
-    productId: number,
-    variationId: number,
-  ): Promise<boolean> {
+  private async validateDuplicatedRow(productId: number, variationId: number): Promise<boolean> {
     const exists = await this.prismaService.productVariations.findFirst({
       select: {
         id: true,

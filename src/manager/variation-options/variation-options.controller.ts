@@ -1,15 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Put,
-  Param,
-  Delete,
-  Res,
-  HttpStatus,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Res, HttpStatus, UseGuards } from '@nestjs/common';
 import { VariationOptionsService } from './variation-options.service';
 import { CreateVariationOptionDto } from './dto/create-variation-option.dto';
 import { UpdateVariationOptionDto } from './dto/update-variation-option.dto';
@@ -20,21 +9,14 @@ import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 @UseGuards(JwtAuthGuard)
 @Controller('manager/variation-options')
 export class VariationOptionsController {
-  constructor(
-    private readonly variationOptionsService: VariationOptionsService,
-  ) {}
+  constructor(private readonly variationOptionsService: VariationOptionsService) {}
 
   @Post()
-  async create(
-    @Body() createVariationOptionDto: CreateVariationOptionDto,
-    @Res() res: Response,
-  ) {
+  async create(@Body() createVariationOptionDto: CreateVariationOptionDto, @Res() res: Response) {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
-          data: await this.variationOptionsService.create(
-            createVariationOptionDto,
-          ),
+          data: await this.variationOptionsService.create(createVariationOptionDto),
         }),
       );
     } catch (error) {
@@ -74,31 +56,20 @@ export class VariationOptionsController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
   @Put(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateVariationOptionDto: UpdateVariationOptionDto,
-    @Res() res: Response,
-  ) {
+  async update(@Param('id') id: string, @Body() updateVariationOptionDto: UpdateVariationOptionDto, @Res() res: Response) {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
-          data: await this.variationOptionsService.update(
-            +id,
-            updateVariationOptionDto,
-          ),
+          data: await this.variationOptionsService.update(+id, updateVariationOptionDto),
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
@@ -111,9 +82,7 @@ export class VariationOptionsController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 }

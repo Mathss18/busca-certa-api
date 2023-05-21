@@ -1,15 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Delete,
-  Res,
-  HttpStatus,
-  Put,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Res, HttpStatus, Put, UseGuards } from '@nestjs/common';
 import { SuppliersCategoryService } from './suppliers-category.service';
 import { CreateSuppliersCategoryDto } from './dto/create-suppliers-category.dto';
 import { UpdateSuppliersCategoryDto } from './dto/update-suppliers-category.dto';
@@ -20,27 +9,18 @@ import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 @UseGuards(JwtAuthGuard)
 @Controller('manager/suppliers-category')
 export class SuppliersCategoryController {
-  constructor(
-    private readonly suppliersCategoryService: SuppliersCategoryService,
-  ) {}
+  constructor(private readonly suppliersCategoryService: SuppliersCategoryService) {}
 
   @Post()
-  async create(
-    @Body() createSuppliersCategoryDto: CreateSuppliersCategoryDto,
-    @Res() res: Response,
-  ) {
+  async create(@Body() createSuppliersCategoryDto: CreateSuppliersCategoryDto, @Res() res: Response) {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
-          data: await this.suppliersCategoryService.create(
-            createSuppliersCategoryDto,
-          ),
+          data: await this.suppliersCategoryService.create(createSuppliersCategoryDto),
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
@@ -53,9 +33,7 @@ export class SuppliersCategoryController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
@@ -68,31 +46,20 @@ export class SuppliersCategoryController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
   @Put(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateSuppliersCategoryDto: UpdateSuppliersCategoryDto,
-    @Res() res: Response,
-  ) {
+  async update(@Param('id') id: string, @Body() updateSuppliersCategoryDto: UpdateSuppliersCategoryDto, @Res() res: Response) {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
-          data: await this.suppliersCategoryService.update(
-            +id,
-            updateSuppliersCategoryDto,
-          ),
+          data: await this.suppliersCategoryService.update(+id, updateSuppliersCategoryDto),
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
@@ -105,9 +72,7 @@ export class SuppliersCategoryController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 }

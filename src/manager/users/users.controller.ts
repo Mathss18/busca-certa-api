@@ -1,15 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Put,
-  Param,
-  Delete,
-  Res,
-  HttpStatus,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Res, HttpStatus, UseGuards } from '@nestjs/common';
 import { HttpReturn } from '../../shared/http-response';
 import { Response } from 'express';
 import { UsersService } from './users.service';
@@ -31,9 +20,7 @@ export class UsersController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
@@ -46,9 +33,7 @@ export class UsersController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
@@ -61,18 +46,12 @@ export class UsersController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
   @Put(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-    @Res() res: Response,
-  ) {
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Res() res: Response) {
     try {
       delete updateUserDto?.password;
 
@@ -82,9 +61,7 @@ export class UsersController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
@@ -97,9 +74,7 @@ export class UsersController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 }

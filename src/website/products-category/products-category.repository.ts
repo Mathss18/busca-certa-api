@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { applyDefaultOrder } from '../../utils/applyDefaultOrder';
-import {
-  FindRelevantsByTermParams,
-  FindRelevantsParams,
-} from './interfaces/products-category.interface';
+import { FindRelevantsByTermParams, FindRelevantsParams } from './interfaces/products-category.interface';
 
 @Injectable()
 export class ProductsCategoryRepository {

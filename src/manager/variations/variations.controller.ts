@@ -1,15 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Put,
-  Param,
-  Delete,
-  Res,
-  HttpStatus,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Res, HttpStatus, UseGuards } from '@nestjs/common';
 import { VariationsService } from './variations.service';
 import { CreateVariationDto } from './dto/create-variation.dto';
 import { UpdateVariationDto } from './dto/update-variation.dto';
@@ -23,10 +12,7 @@ export class VariationsController {
   constructor(private readonly variationsService: VariationsService) {}
 
   @Post()
-  async create(
-    @Body() createVariationDto: CreateVariationDto,
-    @Res() res: Response,
-  ) {
+  async create(@Body() createVariationDto: CreateVariationDto, @Res() res: Response) {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
@@ -34,9 +20,7 @@ export class VariationsController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
@@ -49,9 +33,7 @@ export class VariationsController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
@@ -64,18 +46,12 @@ export class VariationsController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
   @Put(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateVariationDto: UpdateVariationDto,
-    @Res() res: Response,
-  ) {
+  async update(@Param('id') id: string, @Body() updateVariationDto: UpdateVariationDto, @Res() res: Response) {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
@@ -83,9 +59,7 @@ export class VariationsController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
@@ -98,9 +72,7 @@ export class VariationsController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 }

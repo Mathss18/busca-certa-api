@@ -44,9 +44,7 @@ describe('SuppliersCartegoryController', () => {
       ],
     }).compile();
 
-    controller = module.get<SuppliersCategoryController>(
-      SuppliersCategoryController,
-    );
+    controller = module.get<SuppliersCategoryController>(SuppliersCategoryController);
   });
 
   it('should be defined', () => {
@@ -94,11 +92,7 @@ describe('SuppliersCartegoryController', () => {
 
   describe('update a supplier category', () => {
     it('should update a supplier category', async () => {
-      const result: any = await controller.update(
-        '1',
-        modifiedSupplierCategory,
-        res,
-      );
+      const result: any = await controller.update('1', modifiedSupplierCategory, res);
       expect(result).toStrictEqual({
         data: modifiedSupplierCategory,
         message: '',

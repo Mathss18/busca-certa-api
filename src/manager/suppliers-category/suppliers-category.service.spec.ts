@@ -73,9 +73,7 @@ describe('SuppliersCategoryService', () => {
 
   describe('insertOne', () => {
     it('should insert a suppliersCategory', () => {
-      expect(service.create(oneSupplierCategory)).resolves.toEqual(
-        oneSupplierCategory,
-      );
+      expect(service.create(oneSupplierCategory)).resolves.toEqual(oneSupplierCategory);
     });
   });
 

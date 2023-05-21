@@ -29,10 +29,7 @@ export class FeaturesService {
     });
   }
 
-  async update(
-    id: number,
-    updateFeatureDto: UpdateFeatureDto,
-  ): Promise<Features> {
+  async update(id: number, updateFeatureDto: UpdateFeatureDto): Promise<Features> {
     return this.prismaService.features.update({
       data: updateFeatureDto,
       where: {

@@ -9,9 +9,7 @@ import { UpdateVariationOptionDto } from './dto/update-variation-option.dto';
 export class VariationOptionsService {
   constructor(protected readonly prismaService: PrismaService) {}
 
-  create(
-    createVariationOptionDto: CreateVariationOptionDto,
-  ): Promise<VariationOptions> {
+  create(createVariationOptionDto: CreateVariationOptionDto): Promise<VariationOptions> {
     return this.prismaService.variationOptions.create({
       data: createVariationOptionDto,
     });
@@ -31,10 +29,7 @@ export class VariationOptionsService {
     });
   }
 
-  update(
-    id: number,
-    updateVariationOptionDto: UpdateVariationOptionDto,
-  ): Promise<VariationOptions> {
+  update(id: number, updateVariationOptionDto: UpdateVariationOptionDto): Promise<VariationOptions> {
     return this.prismaService.variationOptions.update({
       where: {
         id,

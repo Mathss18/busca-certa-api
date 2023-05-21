@@ -37,18 +37,14 @@ describe('ProductVariationOptionsController', () => {
             findAll: jest.fn().mockResolvedValue([productVariationOptions]),
             findOne: jest.fn().mockResolvedValue(productVariationOptions),
             create: jest.fn().mockResolvedValue(productVariationOptions),
-            update: jest
-              .fn()
-              .mockResolvedValue(modifiedProductVariationOptions),
+            update: jest.fn().mockResolvedValue(modifiedProductVariationOptions),
             remove: jest.fn().mockResolvedValue(productVariationOptions),
           },
         },
       ],
     }).compile();
 
-    controller = module.get<ProductVariationOptionsController>(
-      ProductVariationOptionsController,
-    );
+    controller = module.get<ProductVariationOptionsController>(ProductVariationOptionsController);
   });
 
   it('should be defined', () => {
@@ -96,11 +92,7 @@ describe('ProductVariationOptionsController', () => {
 
   describe('update a product variatios option', () => {
     it('should update a product variatios option', async () => {
-      const result: any = await controller.update(
-        '1',
-        modifiedProductVariationOptions,
-        res,
-      );
+      const result: any = await controller.update('1', modifiedProductVariationOptions, res);
       expect(result).toStrictEqual({
         data: modifiedProductVariationOptions,
         message: '',

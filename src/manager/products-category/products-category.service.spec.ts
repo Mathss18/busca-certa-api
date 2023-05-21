@@ -75,9 +75,7 @@ describe('ProductsCategoryService', () => {
 
   describe('insertOne', () => {
     it('should insert a productsCategory', () => {
-      expect(service.create(oneProductCategory)).resolves.toEqual(
-        oneProductCategory,
-      );
+      expect(service.create(oneProductCategory)).resolves.toEqual(oneProductCategory);
     });
   });
 

@@ -43,9 +43,7 @@ describe('VariationOptionsController', () => {
       ],
     }).compile();
 
-    controller = module.get<VariationOptionsController>(
-      VariationOptionsController,
-    );
+    controller = module.get<VariationOptionsController>(VariationOptionsController);
   });
 
   it('should be defined', () => {
@@ -93,11 +91,7 @@ describe('VariationOptionsController', () => {
 
   describe('update a variatios option', () => {
     it('should update a variatios option', async () => {
-      const result: any = await controller.update(
-        '1',
-        modifiedVariationOptions,
-        res,
-      );
+      const result: any = await controller.update('1', modifiedVariationOptions, res);
       expect(result).toStrictEqual({
         data: modifiedVariationOptions,
         message: '',

@@ -52,9 +52,7 @@ describe('ProductVariationOptionsService', () => {
       ],
     }).compile();
 
-    service = module.get<ProductVariationOptionsService>(
-      ProductVariationOptionsService,
-    );
+    service = module.get<ProductVariationOptionsService>(ProductVariationOptionsService);
     prisma = module.get<PrismaService>(PrismaService);
   });
 
@@ -76,21 +74,14 @@ describe('ProductVariationOptionsService', () => {
 
   describe('insertOne', () => {
     it('should successfully insert a productVariationOptions', () => {
-      expect(service.create(oneProductVariationOptions)).resolves.toEqual(
-        oneProductVariationOptions,
-      );
+      expect(service.create(oneProductVariationOptions)).resolves.toEqual(oneProductVariationOptions);
     });
   });
 
   describe('updateOne', () => {
     it('should call the update method', async () => {
-      const productVariationOptions = await service.update(
-        1,
-        oneProductVariationOptionsModified,
-      );
-      expect(productVariationOptions).toEqual(
-        oneProductVariationOptionsModified,
-      );
+      const productVariationOptions = await service.update(1, oneProductVariationOptionsModified);
+      expect(productVariationOptions).toEqual(oneProductVariationOptionsModified);
     });
   });
 

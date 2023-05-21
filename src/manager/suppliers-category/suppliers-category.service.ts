@@ -31,18 +31,13 @@ export class SuppliersCategoryService {
     });
   }
 
-  async create(
-    createSuppliersCategoryDto: CreateSuppliersCategoryDto,
-  ): Promise<SuppliersCategory> {
+  async create(createSuppliersCategoryDto: CreateSuppliersCategoryDto): Promise<SuppliersCategory> {
     return await this.prismaService.suppliersCategory.create({
       data: createSuppliersCategoryDto,
     });
   }
 
-  async update(
-    id: number,
-    updateSuppliersCategoryDto: UpdateSuppliersCategoryDto,
-  ): Promise<SuppliersCategory> {
+  async update(id: number, updateSuppliersCategoryDto: UpdateSuppliersCategoryDto): Promise<SuppliersCategory> {
     return this.prismaService.suppliersCategory.update({
       data: updateSuppliersCategoryDto,
       where: {

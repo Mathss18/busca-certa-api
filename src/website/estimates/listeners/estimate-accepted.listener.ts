@@ -6,7 +6,6 @@ import { EstimatesTimelineService } from '../../estimates-timeline/estimates-tim
 import { EstimateTimelineCode } from '../../estimates-timeline/enum/estimate-timeline.enum';
 import { WhatsappService } from '../../../whatsapp/whatsapp.service';
 import { MailService } from '../../../mail/mail.service';
-import { toLocalCurrency } from '../../../utils/currency.util';
 
 @Injectable()
 export class EstimateAcceptedListener {

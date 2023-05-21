@@ -9,9 +9,7 @@ import { UpdateProductsCategoryDto } from './dto/update-products-category.dto';
 export class ProductsCategoryService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(
-    createProductsCategoryDto: CreateProductsCategoryDto,
-  ): Promise<ProductsCategory> {
+  async create(createProductsCategoryDto: CreateProductsCategoryDto): Promise<ProductsCategory> {
     return this.prismaService.productsCategory.create({
       data: createProductsCategoryDto,
     });
@@ -39,10 +37,7 @@ export class ProductsCategoryService {
     });
   }
 
-  async update(
-    id: number,
-    updateProductsCategoryDto: UpdateProductsCategoryDto,
-  ) {
+  async update(id: number, updateProductsCategoryDto: UpdateProductsCategoryDto) {
     return this.prismaService.productsCategory.update({
       where: {
         id,

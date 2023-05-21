@@ -32,10 +32,7 @@ export class VariationsService {
     });
   }
 
-  update(
-    id: number,
-    updateVariationDto: UpdateVariationDto,
-  ): Promise<Variations> {
+  update(id: number, updateVariationDto: UpdateVariationDto): Promise<Variations> {
     return this.prismaService.variations.update({
       where: {
         id,

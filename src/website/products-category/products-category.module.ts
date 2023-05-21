@@ -6,10 +6,6 @@ import { ProductsCategoryRepository } from './products-category.repository';
 
 @Module({
   controllers: [ProductsCategoryController],
-  providers: [
-    ProductsCategoryService,
-    ProductsCategoryRepository,
-    PrismaService,
-  ],
+  providers: [ProductsCategoryService, ProductsCategoryRepository, PrismaService],
 })
 export class ProductsCategoryModule {}

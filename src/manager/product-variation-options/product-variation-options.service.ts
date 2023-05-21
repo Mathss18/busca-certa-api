@@ -8,9 +8,7 @@ import { UpdateProductVariationOptionDto } from './dto/update-product-variation-
 export class ProductVariationOptionsService {
   constructor(protected readonly prismaService: PrismaService) {}
 
-  async create(
-    createProductVariationOptionDto: CreateProductVariationOptionDto,
-  ) {
+  async create(createProductVariationOptionDto: CreateProductVariationOptionDto) {
     const exists = await this.validateDuplicatedRow(
       createProductVariationOptionDto.productVariationId,
       createProductVariationOptionDto.variationOptionId,
@@ -36,10 +34,7 @@ export class ProductVariationOptionsService {
     });
   }
 
-  update(
-    id: number,
-    updateProductVariationOptionDto: UpdateProductVariationOptionDto,
-  ) {
+  update(id: number, updateProductVariationOptionDto: UpdateProductVariationOptionDto) {
     return this.prismaService.productVariationOptions.update({
       where: {
         id,
@@ -56,10 +51,7 @@ export class ProductVariationOptionsService {
     });
   }
 
-  private async validateDuplicatedRow(
-    productVariationId: number,
-    variationOptionId: number,
-  ): Promise<boolean> {
+  private async validateDuplicatedRow(productVariationId: number, variationOptionId: number): Promise<boolean> {
     const exists = await this.prismaService.productVariationOptions.findFirst({
       select: {
         id: true,

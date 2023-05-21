@@ -1,11 +1,4 @@
-import {
-  IsBoolean,
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MaxLength,
-} from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateFeatureDto {
   @IsNotEmpty()

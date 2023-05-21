@@ -1,15 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Put,
-  Param,
-  Delete,
-  Res,
-  HttpStatus,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Res, HttpStatus, UseGuards } from '@nestjs/common';
 import { ProductVariationOptionsService } from './product-variation-options.service';
 import { CreateProductVariationOptionDto } from './dto/create-product-variation-option.dto';
 import { UpdateProductVariationOptionDto } from './dto/update-product-variation-option.dto';
@@ -20,21 +9,14 @@ import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 @UseGuards(JwtAuthGuard)
 @Controller('manager/product-variation-options')
 export class ProductVariationOptionsController {
-  constructor(
-    private readonly productVariationOptionsService: ProductVariationOptionsService,
-  ) {}
+  constructor(private readonly productVariationOptionsService: ProductVariationOptionsService) {}
 
   @Post()
-  async create(
-    @Body() createProductVariationOptionDto: CreateProductVariationOptionDto,
-    @Res() res: Response,
-  ) {
+  async create(@Body() createProductVariationOptionDto: CreateProductVariationOptionDto, @Res() res: Response) {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
-          data: await this.productVariationOptionsService.create(
-            createProductVariationOptionDto,
-          ),
+          data: await this.productVariationOptionsService.create(createProductVariationOptionDto),
         }),
       );
     } catch (error) {
@@ -84,18 +66,11 @@ export class ProductVariationOptionsController {
   }
 
   @Put(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateProductVariationOptionDto: UpdateProductVariationOptionDto,
-    @Res() res: Response,
-  ) {
+  async update(@Param('id') id: string, @Body() updateProductVariationOptionDto: UpdateProductVariationOptionDto, @Res() res: Response) {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
-          data: await this.productVariationOptionsService.update(
-            +id,
-            updateProductVariationOptionDto,
-          ),
+          data: await this.productVariationOptionsService.update(+id, updateProductVariationOptionDto),
         }),
       );
     } catch (error) {

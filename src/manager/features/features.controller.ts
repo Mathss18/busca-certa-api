@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Delete,
-  Res,
-  HttpStatus,
-  Put,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Res, HttpStatus, Put } from '@nestjs/common';
 import { FeaturesService } from './features.service';
 import { CreateFeatureDto } from './dto/create-feature.dto';
 import { HttpReturn } from '../../shared/http-response';
@@ -20,10 +10,7 @@ export class FeaturesController {
   constructor(private readonly featuresService: FeaturesService) {}
 
   @Post()
-  async create(
-    @Body() createFeatureDto: CreateFeatureDto,
-    @Res() res: Response,
-  ) {
+  async create(@Body() createFeatureDto: CreateFeatureDto, @Res() res: Response) {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
@@ -31,9 +18,7 @@ export class FeaturesController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
@@ -46,9 +31,7 @@ export class FeaturesController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
@@ -61,18 +44,12 @@ export class FeaturesController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
   @Put(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateFeatureDto: UpdateFeatureDto,
-    @Res() res: Response,
-  ) {
+  async update(@Param('id') id: string, @Body() updateFeatureDto: UpdateFeatureDto, @Res() res: Response) {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
@@ -80,9 +57,7 @@ export class FeaturesController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 
@@ -95,9 +70,7 @@ export class FeaturesController {
         }),
       );
     } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(HttpReturn.build({ success: false, message: error.message }));
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }
 }

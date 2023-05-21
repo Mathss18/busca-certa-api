@@ -74,18 +74,13 @@ describe('ProductVariationsService', () => {
 
   describe('insertOne', () => {
     it('should successfully insert a productVariations', () => {
-      expect(service.create(oneProductVariations)).resolves.toEqual(
-        oneProductVariations,
-      );
+      expect(service.create(oneProductVariations)).resolves.toEqual(oneProductVariations);
     });
   });
 
   describe('updateOne', () => {
     it('should call the update method', async () => {
-      const productVariations = await service.update(
-        1,
-        oneProductVariationsModified,
-      );
+      const productVariations = await service.update(1, oneProductVariationsModified);
       expect(productVariations).toEqual(oneProductVariationsModified);
     });
   });

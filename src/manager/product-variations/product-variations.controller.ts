@@ -1,15 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Put,
-  Param,
-  Delete,
-  Res,
-  HttpStatus,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Res, HttpStatus, UseGuards } from '@nestjs/common';
 import { ProductVariationsService } from './product-variations.service';
 import { CreateProductVariationDto } from './dto/create-product-variation.dto';
 import { UpdateProductVariationDto } from './dto/update-product-variation.dto';
@@ -20,21 +9,14 @@ import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 @UseGuards(JwtAuthGuard)
 @Controller('manager/product-variations')
 export class ProductVariationsController {
-  constructor(
-    private readonly productVariationsService: ProductVariationsService,
-  ) {}
+  constructor(private readonly productVariationsService: ProductVariationsService) {}
 
   @Post()
-  async create(
-    @Body() createProductVariationDto: CreateProductVariationDto,
-    @Res() res: Response,
-  ) {
+  async create(@Body() createProductVariationDto: CreateProductVariationDto, @Res() res: Response) {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
-          data: await this.productVariationsService.create(
-            createProductVariationDto,
-          ),
+          data: await this.productVariationsService.create(createProductVariationDto),
         }),
       );
     } catch (error) {
@@ -84,18 +66,11 @@ export class ProductVariationsController {
   }
 
   @Put(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateProductVariationDto: UpdateProductVariationDto,
-    @Res() res: Response,
-  ) {
+  async update(@Param('id') id: string, @Body() updateProductVariationDto: UpdateProductVariationDto, @Res() res: Response) {
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
-          data: await this.productVariationsService.update(
-            +id,
-            updateProductVariationDto,
-          ),
+          data: await this.productVariationsService.update(+id, updateProductVariationDto),
         }),
       );
     } catch (error) {
