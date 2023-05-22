@@ -22,6 +22,8 @@ jobs:
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOSTNAME }} <<EOF
           cd busca-certa/busca-certa-api/
           git pull origin master
+          sudo rm -rf node_modules
+          sudo rm -rf dist
           docker-compose -f docker-compose.prod.yaml down
           docker-compose -f docker-compose.prod.yaml build
           docker-compose -f docker-compose.prod.yaml up -d
