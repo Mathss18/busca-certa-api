@@ -8,6 +8,5 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.enableCors();
   await app.listen(3000);
-  // test auto deploy
 }
 bootstrap();
