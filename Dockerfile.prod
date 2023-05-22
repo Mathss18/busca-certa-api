@@ -2,10 +2,8 @@ FROM node:18.14-alpine
 
 RUN npm i -g @nestjs/cli
 WORKDIR /node_app
-COPY package.json ./
-COPY package-lock.json ./
-RUN npm pkg delete scripts.prepare
 COPY . .
+RUN npm pkg delete scripts.prepare
 RUN npm install --omit=dev
 RUN npm run build
 EXPOSE 3000
