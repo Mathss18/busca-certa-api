@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  nodejs:
+    tty: true
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - "3000:3000"
+    networks:
+      - network
+    container_name: busca_certa-node
+    volumes:
+      - .:/node_app
+    env_file:
+      - .env
+
+  nginx:
+    image: nginx:1.23.3
+    ports:
+      - "80:80"
+    container_name: busca_certa-nginx
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - network
+    depends_on:
+      - nodejs
+
+networks:
+  network:
+    driver: bridge
