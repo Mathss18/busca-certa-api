@@ -8,5 +8,6 @@ RUN npm pkg delete scripts.prepare
 RUN npm install --omit=dev
 USER node
 COPY . .
+RUN npm run build
 EXPOSE 3000
 CMD ["npm", "run", "start:prod"]
