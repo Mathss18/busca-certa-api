@@ -11,8 +11,6 @@ services:
     networks:
       - network
     container_name: busca_certa-node
-    volumes:
-      - .:/node_app
     env_file:
       - .env
 
