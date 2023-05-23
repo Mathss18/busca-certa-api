@@ -1,8 +1,8 @@
-name: CI
+name: CI/CD
 
 on:
   push:
-    branches-ignore:
+    branches:
       - main
   pull_request:
 
@@ -35,10 +35,33 @@ jobs:
       run: npm ci
 
     - name: Run Linter
-      run: npm run lint  # Remove this if you don't have a linter set up
+      run: npm run lint
 
     - name: Build Project
       run: npm run build
 
     - name: Run tests
       run: npm test
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.5.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Deploy to EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOSTNAME }} <<EOF
+          cd busca-certa-api/
+          git pull origin main
+          docker-compose -f docker-compose.prod.yaml down
+          docker-compose -f docker-compose.prod.yaml build
+          docker-compose -f docker-compose.prod.yaml up -d
+        EOF
