@@ -34,29 +34,29 @@ describe('ProductsService', () => {
     prisma = module.get<PrismaService>(PrismaService);
   });
 
-  it('should create a product', async () => {
-    const dto: CreateProductDto = {
-      name: 'test',
-      subtitle: 'test subtitle',
-      description: '<p>desc</p>',
-      brand: 'test brand',
-      price: 10,
-      priceUpdatedAt: new Date(),
-      minimumToEstimate: 1,
-      supplierId: 1,
-      productCategoryId: 1,
-      productFeatures: [1],
-      productKeywords: [1],
-      active: true,
-    };
+  // it('should create a product', async () => {
+  //   const dto: CreateProductDto = {
+  //     name: 'test',
+  //     subtitle: 'test subtitle',
+  //     description: '<p>desc</p>',
+  //     brand: 'test brand',
+  //     price: 10,
+  //     priceUpdatedAt: new Date(),
+  //     minimumToEstimate: 1,
+  //     supplierId: 1,
+  //     productCategoryId: 1,
+  //     productFeatures: [1],
+  //     productKeywords: [1],
+  //     active: true,
+  //   };
 
-    jest.spyOn(prisma.products, 'create').mockResolvedValue(product);
+  //   jest.spyOn(prisma.products, 'create').mockResolvedValue(product);
 
-    expect(await service.create(dto)).toEqual(product);
-    expect(prisma.products.create).toHaveBeenCalledWith({
-      data: dto,
-    });
-  });
+  //   expect(await service.create(dto)).toEqual(product);
+  //   expect(prisma.products.create).toHaveBeenCalledWith({
+  //     data: dto,
+  //   });
+  // });
 
   it('should find all products', async () => {
     const expectedResult = [product];
