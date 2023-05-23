@@ -22,9 +22,7 @@ jobs:
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOSTNAME }} <<EOF
           cd busca-certa-api/
           git pull origin master
-          sudo caddy stop
           docker-compose -f docker-compose.prod.yaml down
           docker-compose -f docker-compose.prod.yaml build
           docker-compose -f docker-compose.prod.yaml up -d
-          nohup sudo caddy start &
         EOF
