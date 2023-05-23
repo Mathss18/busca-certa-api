@@ -26,5 +26,5 @@ jobs:
           docker-compose -f docker-compose.prod.yaml down
           docker-compose -f docker-compose.prod.yaml build
           docker-compose -f docker-compose.prod.yaml up -d
-          sudo caddy start
+          nohup sudo caddy start &
         EOF
