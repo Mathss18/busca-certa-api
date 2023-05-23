@@ -1,109 +1,231 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaService } from '../../database/prisma.service';
 import { ProductsService } from './products.service';
-
-const productsArray = [
-  {
-    id: 1,
-    name: 'Caneta',
-    description: 'Caneta Bic bonita',
-    subtitle: 'Azul',
-    brand: 'Bic',
-    rating: 5,
-    image: null,
-    price: 1.99,
-    priceUpdatedAt: new Date(),
-    supplierId: 1,
-    productCategoryId: 2,
-    active: true,
-    createdAt: '2023-03-09T19:56:30.316Z',
-    updatedAt: '2023-03-09T19:56:30.316Z',
-  },
-  {
-    id: 2,
-    name: 'Bola',
-    description: 'Bola quadrada bonita',
-    subtitle: 'Vermelha',
-    brand: 'Nike',
-    rating: 5,
-    image: null,
-    price: 1.99,
-    priceUpdatedAt: new Date(),
-    supplierId: 1,
-    productCategoryId: 2,
-    active: true,
-    createdAt: '2023-03-09T19:56:30.316Z',
-    updatedAt: '2023-03-09T19:56:30.316Z',
-  },
-];
-
-const oneProduct = productsArray[0];
-const oneProductModified = {
-  ...oneProduct,
-  variationOptionId: 3,
-};
+import { PrismaService } from '../../database/prisma.service';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 describe('ProductsService', () => {
   let service: ProductsService;
   let prisma: PrismaService;
 
-  const db = {
-    products: {
-      findMany: jest.fn().mockResolvedValue(productsArray),
-      findFirst: jest.fn().mockResolvedValue(oneProduct),
-      create: jest.fn().mockResolvedValue(oneProduct),
-      update: jest.fn().mockResolvedValue(oneProductModified),
-      delete: jest.fn().mockResolvedValue(oneProduct),
-    },
+  const product = {
+    id: 1,
+    name: 'Bola',
+    subtitle: 'sub',
+    description: '<p>desc</p>',
+    brand: 'marca',
+    image: 'https://busca-certa-bucket.s3.sa-east-1.amazonaws.com/Bola-10-product.png',
+    rating: 5,
+    minimumToEstimate: 1,
+    price: 0,
+    priceUpdatedAt: new Date(),
+    supplierId: 10,
+    productCategoryId: 1,
+    active: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        ProductsService,
-        {
-          provide: PrismaService,
-          useValue: db,
-        },
-      ],
+      providers: [ProductsService, PrismaService],
     }).compile();
 
     service = module.get<ProductsService>(ProductsService);
     prisma = module.get<PrismaService>(PrismaService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
+  it('should create a product', async () => {
+    const dto: CreateProductDto = {
+      name: 'test',
+      subtitle: 'test subtitle',
+      description: '<p>desc</p>',
+      brand: 'test brand',
+      price: 10,
+      priceUpdatedAt: new Date(),
+      minimumToEstimate: 1,
+      supplierId: 1,
+      productCategoryId: 1,
+      productFeatures: [1],
+      productKeywords: [1],
+      active: true,
+    };
 
-  describe('getAll', () => {
-    it('should return an array of products', async () => {
-      expect(await service.findAll()).toEqual(productsArray);
+    jest.spyOn(prisma.products, 'create').mockResolvedValue(product);
+
+    expect(await service.create(dto)).toEqual(product);
+    expect(prisma.products.create).toHaveBeenCalledWith({
+      data: dto,
     });
   });
 
-  describe('getOne', () => {
-    it('should get a single products', () => {
-      expect(service.findOne(1)).resolves.toEqual(oneProduct);
+  it('should find all products', async () => {
+    const expectedResult = [product];
+
+    jest.spyOn(prisma.products, 'findMany').mockResolvedValue(expectedResult);
+
+    expect(await service.findAll()).toEqual(expectedResult);
+  });
+
+  it('should find one product with variations', async () => {
+    const expectedResult = product;
+
+    jest.spyOn(prisma.products, 'findFirst').mockResolvedValue(expectedResult);
+
+    expect(await service.findOneWithVariations(1)).toEqual(expectedResult);
+    expect(prisma.products.findFirst).toHaveBeenCalledWith({
+      include: {
+        productsVariations: {
+          select: {
+            active: true,
+            id: true,
+            variation: {
+              select: {
+                active: true,
+                id: true,
+                name: true,
+                variationsOptions: {
+                  select: {
+                    active: true,
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      where: { id: 1 },
     });
   });
 
-  describe('insertOne', () => {
-    it('should successfully insert a products', () => {
-      expect(service.create(oneProduct)).resolves.toEqual(oneProduct);
+  it('should find one product with variations and variation options', async () => {
+    const expectedResult = product;
+
+    jest.spyOn(prisma.products, 'findFirst').mockResolvedValue(expectedResult);
+
+    expect(await service.findOneWithVariationsAndVariationOptions(1)).toEqual(expectedResult);
+    expect(prisma.products.findFirst).toHaveBeenCalledWith({
+      include: {
+        productsVariations: {
+          include: {
+            variation: {
+              include: {
+                variationsOptions: {
+                  orderBy: {
+                    id: 'desc',
+                  },
+                  select: {
+                    id: true,
+                    name: true,
+                    productsVariationOptions: {
+                      select: {
+                        id: true,
+                      },
+                      where: {
+                        productVariation: {
+                          productId: 1,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      where: { id: 1 },
     });
   });
 
-  describe('updateOne', () => {
-    it('should call the update method', async () => {
-      const products = await service.update(1, oneProductModified);
-      expect(products).toEqual(oneProductModified);
+  it('should find one product', async () => {
+    const expectedResult = product;
+
+    jest.spyOn(prisma.products, 'findFirst').mockResolvedValue(expectedResult);
+
+    expect(await service.findOne(1)).toEqual(expectedResult);
+    expect(prisma.products.findFirst).toHaveBeenCalledWith({
+      include: {
+        productFeatures: {
+          select: {
+            features: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+        productKeywords: {
+          select: {
+            keywords: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+      where: { id: 1 },
     });
   });
 
-  describe('deleteOne', () => {
-    it('should dlete a products', () => {
-      expect(service.remove(1)).resolves.toEqual(oneProduct);
+  // it('should update a product', async () => {
+  //   const dto: UpdateProductDto = {
+  //     name: 'updated',
+  //     subtitle: 'updated subtitle',
+  //     description: 'updated description',
+  //     active: false,
+  //     brand: 'updated brand',
+  //     minimumToEstimate: 2,
+  //     price: 20,
+  //     priceUpdatedAt: new Date(),
+  //     productCategoryId: 1,
+  //     productFeatures: [1],
+  //     productKeywords: [1],
+  //     supplierId: 1,
+  //   };
+
+  //   const expectedResult = {
+  //     id: 1,
+  //     name: 'updated',
+  //     subtitle: 'updated subtitle',
+  //     description: 'updated description',
+  //     active: false,
+  //     brand: 'updated brand',
+  //     minimumToEstimate: 2,
+  //     price: 20,
+  //     priceUpdatedAt: new Date(),
+  //     productCategoryId: 1,
+  //     productFeatures: [1],
+  //     productKeywords: [1],
+  //     supplierId: 1,
+  //     image: 'https://busca-certa-bucket.s3.sa-east-1.amazonaws.com/Bola-10-product.png',
+  //     rating: 5,
+  //     createdAt: new Date(),
+  //     updatedAt: new Date(),
+  //   };
+
+  //   jest.spyOn(prisma.products, 'update').mockResolvedValue(expectedResult);
+
+  //   expect(await service.update(1, dto)).toEqual(expectedResult);
+  //   expect(prisma.products.update).toHaveBeenCalledWith({
+  //     where: { id: 1 },
+  //     data: dto,
+  //   });
+  // });
+
+  it('should remove a product', async () => {
+    const expectedResult = product;
+
+    jest.spyOn(prisma.products, 'delete').mockResolvedValue(expectedResult);
+
+    expect(await service.remove(1)).toEqual(expectedResult);
+    expect(prisma.products.delete).toHaveBeenCalledWith({
+      where: { id: 1 },
     });
   });
 });

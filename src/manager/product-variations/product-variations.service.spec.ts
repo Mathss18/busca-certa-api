@@ -1,55 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaService } from '../../database/prisma.service';
 import { ProductVariationsService } from './product-variations.service';
-
-const productVariationsArray = [
-  {
-    id: 1,
-    productId: 1,
-    variationId: 1,
-    active: true,
-    createdAt: '2023-03-01T00:48:09.470Z',
-    updatedAt: '2023-03-01T00:48:09.470Z',
-  },
-  {
-    id: 2,
-    productId: 1,
-    variationId: 2,
-    active: true,
-    createdAt: '2023-03-01T00:48:09.470Z',
-    updatedAt: '2023-03-01T00:48:09.470Z',
-  },
-];
-
-const oneProductVariations = productVariationsArray[0];
-const oneProductVariationsModified = {
-  ...oneProductVariations,
-  variationId: 3,
-};
+import { PrismaService } from '../../database/prisma.service';
+import { CreateProductVariationDto } from './dto/create-product-variation.dto';
+import { UpdateProductVariationDto } from './dto/update-product-variation.dto';
 
 describe('ProductVariationsService', () => {
   let service: ProductVariationsService;
   let prisma: PrismaService;
 
-  const db = {
-    productVariations: {
-      findMany: jest.fn().mockResolvedValue(productVariationsArray),
-      findFirst: jest.fn().mockResolvedValue(oneProductVariations),
-      create: jest.fn().mockResolvedValue(oneProductVariations),
-      update: jest.fn().mockResolvedValue(oneProductVariationsModified),
-      delete: jest.fn().mockResolvedValue(oneProductVariations),
-    },
-  };
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        ProductVariationsService,
-        {
-          provide: PrismaService,
-          useValue: db,
-        },
-      ],
+      providers: [ProductVariationsService, PrismaService],
     }).compile();
 
     service = module.get<ProductVariationsService>(ProductVariationsService);
@@ -60,34 +21,83 @@ describe('ProductVariationsService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('getAll', () => {
-    it('should return an array of productVariations', async () => {
-      expect(await service.findAll()).toEqual(productVariationsArray);
+  it('should create a product variation', async () => {
+    const dto: CreateProductVariationDto = {
+      productId: 1,
+      variationId: 1,
+      active: true,
+    };
+
+    const expectedResult = { id: 1, ...dto, active: true, createdAt: new Date(), updatedAt: new Date() };
+
+    jest.spyOn(prisma.productVariations, 'findFirst').mockResolvedValue(null);
+    jest.spyOn(prisma.productVariations, 'create').mockResolvedValue(expectedResult);
+
+    expect(await service.create(dto)).toEqual(expectedResult);
+    expect(prisma.productVariations.create).toHaveBeenCalledWith({
+      data: dto,
     });
   });
 
-  describe('getOne', () => {
-    it('should get a single productVariations', () => {
-      expect(service.findOne(1)).resolves.toEqual(oneProductVariations);
+  it('should fail to create a duplicate product variation', async () => {
+    const dto: CreateProductVariationDto = {
+      productId: 1,
+      variationId: 1,
+      active: true,
+    };
+
+    const duplicateResult = { id: 1, ...dto, active: true, createdAt: new Date(), updatedAt: new Date() };
+
+    jest.spyOn(prisma.productVariations, 'findFirst').mockResolvedValue(duplicateResult);
+
+    await expect(service.create(dto)).rejects.toThrow('Cannot link the same variation option twice.');
+  });
+
+  it('should find all product variations', async () => {
+    const expectedResult = [{ id: 1, productId: 1, variationId: 1, active: true, createdAt: new Date(), updatedAt: new Date() }];
+
+    jest.spyOn(prisma.productVariations, 'findMany').mockResolvedValue(expectedResult);
+
+    expect(await service.findAll()).toEqual(expectedResult);
+  });
+
+  it('should find one product variation', async () => {
+    const expectedResult = { id: 1, productId: 1, variationId: 1, active: true, createdAt: new Date(), updatedAt: new Date() };
+
+    jest.spyOn(prisma.productVariations, 'findFirst').mockResolvedValue(expectedResult);
+
+    expect(await service.findOne(1)).toEqual(expectedResult);
+    expect(prisma.productVariations.findFirst).toHaveBeenCalledWith({
+      where: { id: 1 },
     });
   });
 
-  describe('insertOne', () => {
-    it('should successfully insert a productVariations', () => {
-      expect(service.create(oneProductVariations)).resolves.toEqual(oneProductVariations);
+  it('should update a product variation', async () => {
+    const dto: UpdateProductVariationDto = {
+      productId: 2,
+      variationId: 2,
+      active: false,
+    };
+
+    const expectedResult = { id: 1, ...dto, active: true, createdAt: new Date(), updatedAt: new Date() };
+
+    jest.spyOn(prisma.productVariations, 'update').mockResolvedValue(expectedResult);
+
+    expect(await service.update(1, dto)).toEqual(expectedResult);
+    expect(prisma.productVariations.update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: dto,
     });
   });
 
-  describe('updateOne', () => {
-    it('should call the update method', async () => {
-      const productVariations = await service.update(1, oneProductVariationsModified);
-      expect(productVariations).toEqual(oneProductVariationsModified);
-    });
-  });
+  it('should remove a product variation', async () => {
+    const expectedResult = { id: 1, productId: 1, variationId: 1, active: true, createdAt: new Date(), updatedAt: new Date() };
 
-  describe('deleteOne', () => {
-    it('should dlete a productVariations', () => {
-      expect(service.remove(1)).resolves.toEqual(oneProductVariations);
+    jest.spyOn(prisma.productVariations, 'delete').mockResolvedValue(expectedResult);
+
+    expect(await service.remove(1)).toEqual(expectedResult);
+    expect(prisma.productVariations.delete).toHaveBeenCalledWith({
+      where: { id: 1 },
     });
   });
 });

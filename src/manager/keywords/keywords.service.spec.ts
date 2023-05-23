@@ -1,53 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { KeywordsService } from './keywords.service';
 import { PrismaService } from '../../database/prisma.service';
-
-const keywordsArray = [
-  {
-    id: 1,
-    name: 'bolas',
-    active: true,
-    createdAt: '2023-03-09T22:10:17.007Z',
-    updatedAt: '2023-03-09T22:10:17.007Z',
-  },
-  {
-    id: 2,
-    name: 'molas',
-    active: true,
-    createdAt: '2023-03-09T22:10:17.007Z',
-    updatedAt: '2023-03-09T22:10:17.007Z',
-  },
-];
-
-const keyword = keywordsArray[0];
-const keywordModified = {
-  ...keyword,
-  name: 'cordas',
-};
+import { CreateKeywordDto } from './dto/create-keyword.dto';
+import { UpdateKeywordDto } from './dto/update-keyword.dto';
 
 describe('KeywordsService', () => {
   let service: KeywordsService;
   let prisma: PrismaService;
 
-  const db = {
-    keywords: {
-      findMany: jest.fn().mockResolvedValue(keywordsArray),
-      findFirst: jest.fn().mockResolvedValue(keyword),
-      create: jest.fn().mockResolvedValue(keyword),
-      update: jest.fn().mockResolvedValue(keywordModified),
-      delete: jest.fn().mockResolvedValue(keyword),
-    },
-  };
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        KeywordsService,
-        {
-          provide: PrismaService,
-          useValue: db,
-        },
-      ],
+      providers: [KeywordsService, PrismaService],
     }).compile();
 
     service = module.get<KeywordsService>(KeywordsService);
@@ -58,34 +21,64 @@ describe('KeywordsService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('getAll', () => {
-    it('should return an array of keywords', async () => {
-      expect(await service.findAll()).toEqual(keywordsArray);
+  it('should create a keyword', async () => {
+    const dto: CreateKeywordDto = {
+      name: 'Test',
+    };
+
+    const expectedResult = { id: 1, ...dto, active: true, createdAt: new Date(), updatedAt: new Date() };
+
+    jest.spyOn(prisma.keywords, 'create').mockResolvedValue(expectedResult);
+
+    expect(await service.create(dto)).toEqual(expectedResult);
+    expect(prisma.keywords.create).toHaveBeenCalledWith({
+      data: { ...dto, name: dto.name.toLowerCase() },
     });
   });
 
-  describe('getOne', () => {
-    it('should get a single keywords', () => {
-      expect(service.findOne(1)).resolves.toEqual(keyword);
+  it('should find all keywords', async () => {
+    const expectedResult = [{ id: 1, name: 'test', active: true, createdAt: new Date(), updatedAt: new Date() }];
+
+    jest.spyOn(prisma.keywords, 'findMany').mockResolvedValue(expectedResult);
+
+    expect(await service.findAll()).toEqual(expectedResult);
+  });
+
+  it('should find one keyword', async () => {
+    const expectedResult = { id: 1, name: 'test', active: true, createdAt: new Date(), updatedAt: new Date() };
+
+    jest.spyOn(prisma.keywords, 'findFirst').mockResolvedValue(expectedResult);
+
+    expect(await service.findOne(1)).toEqual(expectedResult);
+    expect(prisma.keywords.findFirst).toHaveBeenCalledWith({
+      where: { id: 1 },
     });
   });
 
-  describe('insertOne', () => {
-    it('should successfully insert a keywords', () => {
-      expect(service.create(keyword)).resolves.toEqual(keyword);
+  it('should update a keyword', async () => {
+    const dto: UpdateKeywordDto = {
+      name: 'Updated',
+    };
+
+    const expectedResult = { id: 1, ...dto, active: true, createdAt: new Date(), updatedAt: new Date() };
+
+    jest.spyOn(prisma.keywords, 'update').mockResolvedValue(expectedResult);
+
+    expect(await service.update(1, dto)).toEqual(expectedResult);
+    expect(prisma.keywords.update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: { ...dto, name: dto.name.toLowerCase() },
     });
   });
 
-  describe('updateOne', () => {
-    it('should call the update method', async () => {
-      const keywords = await service.update(1, keywordModified);
-      expect(keywords).toEqual(keywordModified);
-    });
-  });
+  it('should remove a keyword', async () => {
+    const expectedResult = { id: 1, name: 'test', active: true, createdAt: new Date(), updatedAt: new Date() };
 
-  describe('deleteOne', () => {
-    it('should dlete a keywords', () => {
-      expect(service.remove(1)).resolves.toEqual(keyword);
+    jest.spyOn(prisma.keywords, 'delete').mockResolvedValue(expectedResult);
+
+    expect(await service.remove(1)).toEqual(expectedResult);
+    expect(prisma.keywords.delete).toHaveBeenCalledWith({
+      where: { id: 1 },
     });
   });
 });

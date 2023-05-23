@@ -1,44 +1,44 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SuppliersController } from './suppliers.controller';
 import { SuppliersService } from './suppliers.service';
-import { Response } from 'express';
+import { S3Service } from '../../aws/s3/s3.service';
+import { HttpStatus, INestApplication } from '@nestjs/common';
+import * as request from 'supertest';
+import { CreateSupplierDto } from './dto/create-supplier.dto';
+import { UpdateSupplierDto } from './dto/update-supplier.dto';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
+import { validate } from 'class-validator';
+
+jest.mock('../auth/jwt-auth/jwt-auth.guard', () => {
+  return {
+    JwtAuthGuard: jest.fn().mockImplementation(() => {
+      return {
+        canActivate: (context) => {
+          return true;
+        },
+      };
+    }),
+  };
+});
+jest.mock('../../aws/s3/s3.service');
 
 describe('SuppliersController', () => {
-  let controller: SuppliersController;
-  const res = {
-    status: jest.fn(() => ({
-      json: jest.fn((y) => y),
-    })),
-    json: jest.fn((x) => x),
-  } as unknown as Response;
+  let app: INestApplication;
+  let suppliersService: SuppliersService;
+  let s3Service: S3Service;
 
-  const supplierMock = {
-    id: 1,
-    companyName: 'Empresa Teste',
-    tradingName: 'Empresinha',
-    cnpj: '1234567892',
-    email: 'a2@a.com',
-    phoneNumber: '1934353705',
-    mobileNumber: '19983136930',
-    segment: 'Metalorgico',
-    website: 'https://google.com',
-    description: 'descricao',
-    logo: 'logo',
-    street: 'Rua dos amores',
-    number: '127',
-    neighborhood: 'São Jorge',
-    city: 'Piracicaba',
-    state: 'São Paulo',
-    zipCode: '13402803',
-    supplierCategoryId: null,
-    active: true,
-    createdAt: '2023-03-01T00:48:09.470Z',
-    updatedAt: '2023-03-01T00:48:09.470Z',
+  const mockSuppliersService = {
+    create: jest.fn(),
+    findAll: jest.fn(),
+    findOne: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn(),
   };
 
-  const modifiedSupplier = {
-    ...supplierMock,
-    companyName: 'Empresa Teste2',
+  const mockS3Service = {
+    upload: jest.fn().mockImplementation((name, file) => Promise.resolve(`https://mocks3service.com/${name}`)),
+    delete: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -46,88 +46,135 @@ describe('SuppliersController', () => {
       controllers: [SuppliersController],
       providers: [
         SuppliersService,
+        S3Service,
         {
-          provide: SuppliersService,
-          useValue: {
-            findAll: jest.fn().mockResolvedValue([supplierMock]),
-            findOne: jest.fn().mockResolvedValue(supplierMock),
-            create: jest.fn().mockResolvedValue(supplierMock),
-            update: jest.fn().mockResolvedValue(modifiedSupplier),
-            remove: jest.fn().mockResolvedValue(supplierMock),
-          },
+          provide: APP_GUARD,
+          useClass: JwtAuthGuard,
         },
       ],
-    }).compile();
+    })
+      .overrideProvider(SuppliersService)
+      .useValue(mockSuppliersService)
+      .overrideProvider(S3Service)
+      .useValue(mockS3Service)
+      .compile();
 
-    controller = module.get<SuppliersController>(SuppliersController);
+    app = module.createNestApplication();
+    await app.init();
+    suppliersService = module.get<SuppliersService>(SuppliersService);
+    s3Service = module.get<S3Service>(S3Service);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  it('should create a supplier', async () => {
+    const createSupplierDto = new CreateSupplierDto();
+    mockSuppliersService.create.mockResolvedValue('Created');
+
+    const logo = Buffer.from('TestLogo', 'utf8');
+
+    return request(app.getHttpServer())
+      .post('/manager/suppliers')
+      .attach('logo', logo, { filename: 'logo.png' })
+      .field('supplier', JSON.stringify(createSupplierDto))
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: 'Created', message: '' });
   });
 
-  describe('get all suppliers', () => {
-    it('should return an array of suppliers', async () => {
-      const result: any = await controller.findAll(res);
-      expect(result).toStrictEqual({
-        data: [supplierMock],
-        message: '',
-        success: true,
-      });
+  it('should find all suppliers', async () => {
+    mockSuppliersService.findAll.mockResolvedValue('All suppliers');
 
-      expect(res.status).toHaveBeenCalledWith(200);
+    return request(app.getHttpServer())
+      .get('/manager/suppliers')
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: 'All suppliers', message: '' });
+  });
+
+  it('should find one supplier', async () => {
+    const id = '1';
+    mockSuppliersService.findOne.mockResolvedValue(`Found supplier ${id}`);
+
+    return request(app.getHttpServer())
+      .get(`/manager/suppliers/${id}`)
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: `Found supplier ${id}`, message: '' });
+  });
+
+  it('should update a supplier', async () => {
+    const id = '1';
+    const updateSupplierDto = new UpdateSupplierDto();
+    updateSupplierDto.companyName = 'Updated Supplier';
+    mockSuppliersService.update.mockResolvedValue(`Updated supplier ${id}`);
+
+    const logo = Buffer.from('UpdatedLogo', 'utf8');
+
+    return request(app.getHttpServer())
+      .put(`/manager/suppliers/${id}`)
+      .attach('logo', logo, { filename: 'updated-logo.png' })
+      .field('supplier', JSON.stringify(updateSupplierDto))
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: `Updated supplier ${id}`, message: '' });
+  });
+
+  it('should remove a supplier', async () => {
+    const id = '1';
+    mockSuppliersService.remove.mockResolvedValue(`Removed supplier ${id}`);
+
+    return request(app.getHttpServer())
+      .delete(`/manager/suppliers/${id}`)
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: `Removed supplier ${id}`, message: '' });
+  });
+
+  describe('CreateSupplierDto', () => {
+    it('should be valid with all fields', async () => {
+      const dto = new CreateSupplierDto();
+      dto.companyName = 'Test Supplier';
+      dto.tradingName = 'Test Supplier Trading Name';
+      dto.cnpj = '11222333000100';
+      dto.email = 'test@example.com';
+      dto.phoneNumber = '1234567890';
+      dto.mobileNumber = '0987654321';
+      dto.segment = 'Test Segment';
+      dto.description = 'Test Description';
+      dto.logo = 'http://example.com/logo.png';
+      dto.street = 'Test Street';
+      dto.number = '123';
+      dto.neighborhood = 'Test Neighborhood';
+      dto.city = 'Test City';
+      dto.state = 'TS';
+      dto.zipCode = '12345-678';
+      dto.active = true;
+
+      const validationErrors = await validate(dto);
+      expect(validationErrors).toHaveLength(0);
+    });
+
+    it('should fail validation due to missing required fields', async () => {
+      const dto = new CreateSupplierDto();
+      const validationErrors = await validate(dto);
+
+      expect(validationErrors).not.toHaveLength(0);
+    });
+
+    it('should fail validation due to invalid email', async () => {
+      const dto = new CreateSupplierDto();
+      dto.email = 'invalid-email';
+      const validationErrors = await validate(dto);
+
+      const emailError = validationErrors.find((error) => error.property === 'email');
+      expect(emailError).toBeDefined();
+    });
+
+    it('should fail validation due to invalid URL', async () => {
+      const dto = new CreateSupplierDto();
+      dto.logo = 'invalid-url';
+      const validationErrors = await validate(dto);
+
+      const urlError = validationErrors.find((error) => error.property === 'logo');
+      expect(urlError).toBeDefined();
     });
   });
 
-  describe('get a supplier', () => {
-    it('should return a supplier', async () => {
-      const result: any = await controller.findOne('1', res);
-      expect(result).toStrictEqual({
-        data: supplierMock,
-        message: '',
-        success: true,
-      });
-
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
-  });
-
-  describe('create a supplier', () => {
-    it('should create a supplier', async () => {
-      const result: any = await controller.create(supplierMock, res);
-      expect(result).toStrictEqual({
-        data: supplierMock,
-        message: '',
-        success: true,
-      });
-
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
-  });
-
-  describe('update a supplier', () => {
-    it('should update a supplier', async () => {
-      const result: any = await controller.update('1', modifiedSupplier, res);
-      expect(result).toStrictEqual({
-        data: modifiedSupplier,
-        message: '',
-        success: true,
-      });
-
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
-  });
-
-  describe('remove a supplier', () => {
-    it('should remove a supplier', async () => {
-      const result: any = await controller.remove('1', res);
-      expect(result).toStrictEqual({
-        data: supplierMock,
-        message: '',
-        success: true,
-      });
-
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
+  afterEach(async () => {
+    await app.close();
   });
 });

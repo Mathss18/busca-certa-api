@@ -4,7 +4,7 @@ import axios from 'axios';
 import { URL } from 'url';
 import * as path from 'path';
 
-type Attachment = {
+export type Attachment = {
   url: string;
   contentDisposition?: 'attachment' | 'inline' | undefined;
 };

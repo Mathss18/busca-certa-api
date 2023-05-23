@@ -45,7 +45,7 @@ export class EstimatesController {
         }),
       );
     } catch (error) {
-      this.s3Service.delete(fileName);
+      if (clientFile) this.s3Service.delete(fileName);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
     }
   }

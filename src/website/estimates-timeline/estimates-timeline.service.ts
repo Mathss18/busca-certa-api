@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { EstimatesTimelineRepository } from './estimates-timeline.repository';
-import { EstimatesService } from '../estimates/estimates.service';
 import { EstimateTimelineCode } from './enum/estimate-timeline.enum';
 import { CreateEstimateTimelineDto } from './dto/estimate-timeline.dto';
 
 @Injectable()
 export class EstimatesTimelineService {
-  constructor(private readonly repository: EstimatesTimelineRepository, private readonly estimateService: EstimatesService) {}
+  constructor(private readonly repository: EstimatesTimelineRepository) {}
 
   async create(params: CreateEstimateTimelineDto) {
     return await this.repository.create(params);

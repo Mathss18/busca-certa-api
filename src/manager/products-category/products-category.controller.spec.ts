@@ -1,29 +1,44 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Response } from 'express';
-import { ProductsCategoryController } from './products-category.controller';
+import { S3Service } from '../../aws/s3/s3.service';
+import { HttpStatus, INestApplication } from '@nestjs/common';
+import * as request from 'supertest';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
+import { validate } from 'class-validator';
 import { ProductsCategoryService } from './products-category.service';
+import { ProductsCategoryController } from './products-category.controller';
+import { CreateProductsCategoryDto } from './dto/create-products-category.dto';
+import { UpdateProductsCategoryDto } from './dto/update-products-category.dto';
 
-describe('ProductsCartegoryController', () => {
-  let controller: ProductsCategoryController;
-  const res = {
-    status: jest.fn(() => ({
-      json: jest.fn((y) => y),
-    })),
-    json: jest.fn((x) => x),
-  } as unknown as Response;
+jest.mock('../auth/jwt-auth/jwt-auth.guard', () => {
+  return {
+    JwtAuthGuard: jest.fn().mockImplementation(() => {
+      return {
+        canActivate: (context) => {
+          return true;
+        },
+      };
+    }),
+  };
+});
+jest.mock('../../aws/s3/s3.service');
 
-  const productCategoryMock = {
-    id: 1,
-    name: 'Bolas',
-    parentId: null,
-    active: true,
-    createdAt: '2023-03-01T00:48:09.470Z',
-    updatedAt: '2023-03-01T00:48:09.470Z',
+describe('ProductCategoryController', () => {
+  let app: INestApplication;
+  let productCategoryService: ProductsCategoryService;
+  let s3Service: S3Service;
+
+  const mockProductCategoryService = {
+    create: jest.fn(),
+    findAll: jest.fn(),
+    findOne: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn(),
   };
 
-  const modifiedProductCategory = {
-    ...productCategoryMock,
-    name: 'Roupas',
+  const mockS3Service = {
+    upload: jest.fn().mockImplementation((name, file) => Promise.resolve(`https://mocks3service.com/${name}`)),
+    delete: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -31,88 +46,120 @@ describe('ProductsCartegoryController', () => {
       controllers: [ProductsCategoryController],
       providers: [
         ProductsCategoryService,
+        S3Service,
         {
-          provide: ProductsCategoryService,
-          useValue: {
-            findAll: jest.fn().mockResolvedValue([productCategoryMock]),
-            findOne: jest.fn().mockResolvedValue(productCategoryMock),
-            create: jest.fn().mockResolvedValue(productCategoryMock),
-            update: jest.fn().mockResolvedValue(modifiedProductCategory),
-            remove: jest.fn().mockResolvedValue(productCategoryMock),
-          },
+          provide: APP_GUARD,
+          useClass: JwtAuthGuard,
         },
       ],
-    }).compile();
+    })
+      .overrideProvider(ProductsCategoryService)
+      .useValue(mockProductCategoryService)
+      .overrideProvider(S3Service)
+      .useValue(mockS3Service)
+      .compile();
 
-    controller = module.get<ProductsCategoryController>(ProductsCategoryController);
+    app = module.createNestApplication();
+    await app.init();
+    productCategoryService = module.get<ProductsCategoryService>(ProductsCategoryService);
+    s3Service = module.get<S3Service>(S3Service);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  it('should create a product-category', async () => {
+    const dto = new CreateProductsCategoryDto();
+    mockProductCategoryService.create.mockResolvedValue('Created');
+
+    const image = Buffer.from('TestLogo', 'utf8');
+
+    return request(app.getHttpServer())
+      .post('/manager/products-category')
+      .attach('image', image, { filename: 'image.png' })
+      .field('product-category', JSON.stringify(dto))
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: 'Created', message: '' });
   });
 
-  describe('get all products category', () => {
-    it('should return an array of products category', async () => {
-      const result: any = await controller.findAll(res);
-      expect(result).toStrictEqual({
-        data: [productCategoryMock],
-        message: '',
-        success: true,
-      });
+  it('should find all product categories', async () => {
+    mockProductCategoryService.findAll.mockResolvedValue('All product categories');
 
-      expect(res.status).toHaveBeenCalledWith(200);
+    return request(app.getHttpServer())
+      .get('/manager/products-category')
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: 'All product categories', message: '' });
+  });
+
+  it('should find one product-category', async () => {
+    const id = '1';
+    mockProductCategoryService.findOne.mockResolvedValue(`Found product-category ${id}`);
+
+    return request(app.getHttpServer())
+      .get(`/manager/products-category/${id}`)
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: `Found product-category ${id}`, message: '' });
+  });
+
+  it('should update a product-category', async () => {
+    const id = '1';
+    const dto = new UpdateProductsCategoryDto();
+    dto.name = 'Updated';
+    mockProductCategoryService.update.mockResolvedValue(`Updated ${id}`);
+
+    const image = Buffer.from('UpdatedImage', 'utf8');
+
+    return request(app.getHttpServer())
+      .put(`/manager/products-category/${id}`)
+      .attach('image', image, { filename: 'updated-image.png' })
+      .field('product-category', JSON.stringify(dto))
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: `Updated ${id}`, message: '' });
+  });
+
+  it('should remove a product-category', async () => {
+    const id = '1';
+    mockProductCategoryService.remove.mockResolvedValue(`Removed product-category ${id}`);
+
+    return request(app.getHttpServer())
+      .delete(`/manager/products-category/${id}`)
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: `Removed product-category ${id}`, message: '' });
+  });
+
+  describe('CreateProductsCategoryDto', () => {
+    it('should be valid with all fields', async () => {
+      const dto = new CreateProductsCategoryDto();
+      dto.name = 'Test Category';
+      dto.image = 'http://example.com/image.png';
+      dto.parentId = 1;
+      dto.active = true;
+
+      const validationErrors = await validate(dto);
+      expect(validationErrors).toHaveLength(0);
+    });
+
+    it('should fail validation due to missing required field', async () => {
+      const dto = new CreateProductsCategoryDto();
+      dto.image = 'http://example.com/image.png';
+      dto.parentId = 1;
+      dto.active = true;
+
+      const validationErrors = await validate(dto);
+      expect(validationErrors).not.toHaveLength(0);
+    });
+
+    it('should fail validation due to invalid URL', async () => {
+      const dto = new CreateProductsCategoryDto();
+      dto.name = 'Test Category';
+      dto.image = 'invalid-url';
+      dto.parentId = 1;
+      dto.active = true;
+
+      const validationErrors = await validate(dto);
+      const urlError = validationErrors.find((error) => error.property === 'image');
+      expect(urlError).toBeDefined();
     });
   });
 
-  describe('get a product category', () => {
-    it('should return a product category', async () => {
-      const result: any = await controller.findOne('1', res);
-      expect(result).toStrictEqual({
-        data: productCategoryMock,
-        message: '',
-        success: true,
-      });
-
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
-  });
-
-  describe('create a product category', () => {
-    it('should create a product category', async () => {
-      const result: any = await controller.create(productCategoryMock, res);
-      expect(result).toStrictEqual({
-        data: productCategoryMock,
-        message: '',
-        success: true,
-      });
-
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
-  });
-
-  describe('update a product category', () => {
-    it('should update a product category', async () => {
-      const result: any = await controller.update('1', modifiedProductCategory, res);
-      expect(result).toStrictEqual({
-        data: modifiedProductCategory,
-        message: '',
-        success: true,
-      });
-
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
-  });
-
-  describe('remove a product category', () => {
-    it('should remove a product category', async () => {
-      const result: any = await controller.remove('1', res);
-      expect(result).toStrictEqual({
-        data: productCategoryMock,
-        message: '',
-        success: true,
-      });
-
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
+  afterEach(async () => {
+    await app.close();
   });
 });

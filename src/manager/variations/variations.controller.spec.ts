@@ -1,116 +1,147 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Response } from 'express';
 import { VariationsController } from './variations.controller';
 import { VariationsService } from './variations.service';
+import { HttpStatus, INestApplication } from '@nestjs/common';
+import * as request from 'supertest';
+import { CreateVariationDto } from './dto/create-variation.dto';
+import { UpdateVariationDto } from './dto/update-variation.dto';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
+import { validate } from 'class-validator';
+
+jest.mock('../auth/jwt-auth/jwt-auth.guard', () => {
+  return {
+    // Mock the entire guard
+    JwtAuthGuard: jest.fn().mockImplementation(() => {
+      return {
+        canActivate: (context) => {
+          return true; // Allow all requests to bypass the guard
+        },
+      };
+    }),
+  };
+});
 
 describe('VariationsController', () => {
-  let controller: VariationsController;
-  const res = {
-    status: jest.fn(() => ({
-      json: jest.fn((y) => y),
-    })),
-    json: jest.fn((x) => x),
-  } as unknown as Response;
+  let app: INestApplication;
+  let variationsService: VariationsService;
 
-  const variations = {
-    id: 1,
-    name: 'Cor',
-    active: true,
-    createdAt: '2023-03-09T22:10:17.007Z',
-    updatedAt: '2023-03-09T22:10:17.007Z',
-  };
-
-  const modifiedVariations = {
-    ...variations,
-    name: 'Tamanho',
+  const mockVariationsService = {
+    create: jest.fn(),
+    findAll: jest.fn(),
+    findOne: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn(),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [VariationsController],
       providers: [
+        VariationsService,
         {
-          provide: VariationsService,
-          useValue: {
-            findAll: jest.fn().mockResolvedValue([variations]),
-            findOne: jest.fn().mockResolvedValue(variations),
-            create: jest.fn().mockResolvedValue(variations),
-            update: jest.fn().mockResolvedValue(modifiedVariations),
-            remove: jest.fn().mockResolvedValue(variations),
-          },
+          provide: APP_GUARD,
+          useClass: JwtAuthGuard,
         },
       ],
-    }).compile();
+    })
+      .overrideProvider(VariationsService)
+      .useValue(mockVariationsService)
+      .compile();
 
-    controller = module.get<VariationsController>(VariationsController);
+    app = module.createNestApplication();
+    await app.init();
+    variationsService = module.get<VariationsService>(VariationsService);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  it('should create a variation', async () => {
+    const createVariationDto = new CreateVariationDto();
+    mockVariationsService.create.mockResolvedValue('Created');
+
+    return request(app.getHttpServer())
+      .post('/manager/variations')
+      .send(createVariationDto)
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: 'Created', message: '' });
   });
 
-  describe('get all variations variation options', () => {
-    it('should return an array of variations variation options', async () => {
-      const result: any = await controller.findAll(res);
-      expect(result).toStrictEqual({
-        data: [variations],
-        message: '',
-        success: true,
-      });
+  it('should find all variations', async () => {
+    mockVariationsService.findAll.mockResolvedValue('All variations');
 
-      expect(res.status).toHaveBeenCalledWith(200);
+    return request(app.getHttpServer())
+      .get('/manager/variations')
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: 'All variations', message: '' });
+  });
+
+  it('should find one variation', async () => {
+    const id = '1';
+    mockVariationsService.findOne.mockResolvedValue(`Variation ${id}`);
+
+    return request(app.getHttpServer())
+      .get(`/manager/variations/${id}`)
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: `Variation ${id}`, message: '' });
+  });
+
+  it('should update a variation', async () => {
+    const id = '1';
+    const updateVariationDto = new UpdateVariationDto();
+    mockVariationsService.update.mockResolvedValue(`Updated variation ${id}`);
+
+    return request(app.getHttpServer())
+      .put(`/manager/variations/${id}`)
+      .send(updateVariationDto)
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: `Updated variation ${id}`, message: '' });
+  });
+
+  it('should remove a variation', async () => {
+    const id = '1';
+    mockVariationsService.remove.mockResolvedValue(`Removed variation ${id}`);
+
+    return request(app.getHttpServer())
+      .delete(`/manager/variations/${id}`)
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: `Removed variation ${id}`, message: '' });
+  });
+
+  describe('CreateVariationDto', () => {
+    it('should be valid with a name and an optional active status', async () => {
+      const dto = new CreateVariationDto();
+      dto.name = 'Variation Name';
+      dto.active = true;
+
+      const errors = await validate(dto);
+      expect(errors.length).toEqual(0);
+    });
+
+    it('should be invalid with an empty name', async () => {
+      const dto = new CreateVariationDto();
+      dto.name = '';
+
+      const errors = await validate(dto);
+      expect(errors.length).toBeGreaterThan(0);
+    });
+
+    it('should be invalid with a name longer than 191 characters', async () => {
+      const dto = new CreateVariationDto();
+      dto.name = 'a'.repeat(192);
+
+      const errors = await validate(dto);
+      expect(errors.length).toBeGreaterThan(0);
+    });
+
+    it('should be invalid with a non-string name', async () => {
+      const dto = new CreateVariationDto();
+      dto.name = 123 as any;
+
+      const errors = await validate(dto);
+      expect(errors.length).toBeGreaterThan(0);
     });
   });
 
-  describe('get a variatios option', () => {
-    it('should return a variatios option', async () => {
-      const result: any = await controller.findOne('1', res);
-      expect(result).toStrictEqual({
-        data: variations,
-        message: '',
-        success: true,
-      });
-
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
-  });
-
-  describe('create a variatios option', () => {
-    it('should create a variatios option', async () => {
-      const result: any = await controller.create(variations, res);
-      expect(result).toStrictEqual({
-        data: variations,
-        message: '',
-        success: true,
-      });
-
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
-  });
-
-  describe('update a variatios option', () => {
-    it('should update a variatios option', async () => {
-      const result: any = await controller.update('1', modifiedVariations, res);
-      expect(result).toStrictEqual({
-        data: modifiedVariations,
-        message: '',
-        success: true,
-      });
-
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
-  });
-
-  describe('remove a variatios option', () => {
-    it('should remove a variatios option', async () => {
-      const result: any = await controller.remove('1', res);
-      expect(result).toStrictEqual({
-        data: variations,
-        message: '',
-        success: true,
-      });
-
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
+  afterEach(async () => {
+    await app.close();
   });
 });

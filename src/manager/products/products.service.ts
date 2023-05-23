@@ -18,7 +18,6 @@ export class ProductsService {
     delete createProductDto.productFeatures; // Remove productFeatures from DTO
     delete createProductDto.productKeywords; // Remove productKeywords from DTO
 
-    console.log(typeof createProductDto.price);
     const product = await this.prismaService.products.create({
       data: createProductDto as any,
     });
@@ -109,8 +108,8 @@ export class ProductsService {
     });
 
     // Add a computed property to each VariationOption indicating whether it is linked to the product or not
-    product.productsVariations.map((pv) => {
-      pv.variation.variationsOptions.map((vo: any) => {
+    product?.productsVariations?.map((pv) => {
+      pv.variation.variationsOptions?.map((vo: any) => {
         vo.isLinked = vo.productsVariationOptions.length > 0;
       });
     });

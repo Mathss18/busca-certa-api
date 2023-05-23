@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Param, Delete, Res, HttpStatus, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Res, HttpStatus, Put, UseGuards } from '@nestjs/common';
 import { FeaturesService } from './features.service';
 import { CreateFeatureDto } from './dto/create-feature.dto';
 import { HttpReturn } from '../../shared/http-response';
 import { Response } from 'express';
 import { UpdateFeatureDto } from './dto/update-feature.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('manager/features')
 export class FeaturesController {
   constructor(private readonly featuresService: FeaturesService) {}

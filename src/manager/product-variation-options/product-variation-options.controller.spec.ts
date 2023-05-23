@@ -1,29 +1,36 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Response } from 'express';
+import { HttpStatus, INestApplication } from '@nestjs/common';
+import * as request from 'supertest';
+import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
+import { validate } from 'class-validator';
 import { ProductVariationOptionsController } from './product-variation-options.controller';
 import { ProductVariationOptionsService } from './product-variation-options.service';
+import { CreateProductVariationOptionDto } from './dto/create-product-variation-option.dto';
+import { UpdateProductVariationOptionDto } from './dto/update-product-variation-option.dto';
+import { APP_GUARD } from '@nestjs/core';
+
+jest.mock('../auth/jwt-auth/jwt-auth.guard', () => {
+  return {
+    JwtAuthGuard: jest.fn().mockImplementation(() => {
+      return {
+        canActivate: (context) => {
+          return true;
+        },
+      };
+    }),
+  };
+});
 
 describe('ProductVariationOptionsController', () => {
-  let controller: ProductVariationOptionsController;
-  const res = {
-    status: jest.fn(() => ({
-      json: jest.fn((y) => y),
-    })),
-    json: jest.fn((x) => x),
-  } as unknown as Response;
+  let app: INestApplication;
+  let productVariationOptionsService: ProductVariationOptionsService;
 
-  const productVariationOptions = {
-    id: 1,
-    productVariationId: 1,
-    variationOptionId: 1,
-    active: true,
-    createdAt: '2023-03-01T00:48:09.470Z',
-    updatedAt: '2023-03-01T00:48:09.470Z',
-  };
-
-  const modifiedProductVariationOptions = {
-    ...productVariationOptions,
-    variationOptionId: 2,
+  const mockProductVariationOptionsService = {
+    create: jest.fn(),
+    findAll: jest.fn(),
+    findOne: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -32,87 +39,94 @@ describe('ProductVariationOptionsController', () => {
       providers: [
         ProductVariationOptionsService,
         {
-          provide: ProductVariationOptionsService,
-          useValue: {
-            findAll: jest.fn().mockResolvedValue([productVariationOptions]),
-            findOne: jest.fn().mockResolvedValue(productVariationOptions),
-            create: jest.fn().mockResolvedValue(productVariationOptions),
-            update: jest.fn().mockResolvedValue(modifiedProductVariationOptions),
-            remove: jest.fn().mockResolvedValue(productVariationOptions),
-          },
+          provide: APP_GUARD,
+          useClass: JwtAuthGuard,
         },
       ],
-    }).compile();
+    })
+      .overrideProvider(ProductVariationOptionsService)
+      .useValue(mockProductVariationOptionsService)
+      .compile();
 
-    controller = module.get<ProductVariationOptionsController>(ProductVariationOptionsController);
+    app = module.createNestApplication();
+    await app.init();
+    productVariationOptionsService = module.get<ProductVariationOptionsService>(ProductVariationOptionsService);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  it('should create a product variation option', async () => {
+    const createProductVariationOptionDto = new CreateProductVariationOptionDto();
+    mockProductVariationOptionsService.create.mockResolvedValue('Created');
+
+    return request(app.getHttpServer())
+      .post('/manager/product-variation-options')
+      .send(createProductVariationOptionDto)
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: 'Created', message: '' });
   });
 
-  describe('get all product variation options', () => {
-    it('should return an array of product variation options', async () => {
-      const result: any = await controller.findAll(res);
-      expect(result).toStrictEqual({
-        data: [productVariationOptions],
-        message: '',
-        success: true,
-      });
+  it('should find all product variation options', async () => {
+    mockProductVariationOptionsService.findAll.mockResolvedValue('All');
 
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
+    return request(app.getHttpServer())
+      .get('/manager/product-variation-options')
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: 'All', message: '' });
   });
 
-  describe('get a product variatios option', () => {
-    it('should return a product variatios option', async () => {
-      const result: any = await controller.findOne('1', res);
-      expect(result).toStrictEqual({
-        data: productVariationOptions,
-        message: '',
-        success: true,
-      });
+  it('should find one product variation option', async () => {
+    const id = '1';
+    mockProductVariationOptionsService.findOne.mockResolvedValue(`find ${id}`);
 
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
+    return request(app.getHttpServer())
+      .get(`/manager/product-variation-options/${id}`)
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: `find ${id}`, message: '' });
   });
 
-  describe('create a product variatios option', () => {
-    it('should create a product variatios option', async () => {
-      const result: any = await controller.create(productVariationOptions, res);
-      expect(result).toStrictEqual({
-        data: productVariationOptions,
-        message: '',
-        success: true,
-      });
+  it('should update a product variation option', async () => {
+    const id = '1';
+    const updateProductVariationOptionDto = new UpdateProductVariationOptionDto();
+    mockProductVariationOptionsService.update.mockResolvedValue(`Updated ${id}`);
 
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
+    return request(app.getHttpServer())
+      .put(`/manager/product-variation-options/${id}`)
+      .send(updateProductVariationOptionDto)
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: `Updated ${id}`, message: '' });
   });
 
-  describe('update a product variatios option', () => {
-    it('should update a product variatios option', async () => {
-      const result: any = await controller.update('1', modifiedProductVariationOptions, res);
-      expect(result).toStrictEqual({
-        data: modifiedProductVariationOptions,
-        message: '',
-        success: true,
-      });
+  it('should remove a product variation option', async () => {
+    const id = '1';
+    mockProductVariationOptionsService.remove.mockResolvedValue(`Removed ${id}`);
 
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
+    return request(app.getHttpServer())
+      .delete(`/manager/product-variation-options/${id}`)
+      .expect(HttpStatus.OK)
+      .expect({ success: true, data: `Removed ${id}`, message: '' });
   });
 
-  describe('remove a product variatios option', () => {
-    it('should remove a product variatios option', async () => {
-      const result: any = await controller.remove('1', res);
-      expect(result).toStrictEqual({
-        data: productVariationOptions,
-        message: '',
-        success: true,
-      });
+  afterEach(async () => {
+    await app.close();
+    jest.resetAllMocks();
+  });
+});
 
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
+describe('CreateProductVariationOptionDto', () => {
+  it('should validate if productVariationId and variationOptionId are not empty', async () => {
+    const dto = new CreateProductVariationOptionDto();
+    dto.productVariationId = 1;
+    dto.variationOptionId = 1;
+    const errors = await validate(dto);
+    expect(errors).toHaveLength(0);
+  });
+
+  it('should not validate if productVariationId or variationOptionId are empty', async () => {
+    const dto = new CreateProductVariationOptionDto();
+    dto.productVariationId = null;
+    dto.variationOptionId = null;
+    const errors = await validate(dto);
+    expect(errors).toHaveLength(2);
+    expect(errors[0].property).toEqual('productVariationId');
+    expect(errors[1].property).toEqual('variationOptionId');
   });
 });

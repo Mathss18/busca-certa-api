@@ -1,59 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaService } from '../../database/prisma.service';
 import { UsersService } from './users.service';
+import { PrismaService } from '../../database/prisma.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import * as bcrypt from 'bcrypt';
 
-const usersArray = [
-  {
-    id: 1,
-    name: 'João',
-    email: 'joão@joão.com',
-    password: 'senha-forte',
-    type: 'admin',
-    active: true,
-    createdAt: '2023-03-09T19:56:30.316Z',
-    updatedAt: '2023-03-09T19:56:30.316Z',
-  },
-  {
-    id: 2,
-    name: 'Maria',
-    email: 'maria@maria.com',
-    password: 'senha-forte',
-    type: 'admin',
-    active: true,
-    createdAt: '2023-03-09T19:56:30.316Z',
-    updatedAt: '2023-03-09T19:56:30.316Z',
-  },
-];
-
-const oneProduct = usersArray[0];
-const oneProductModified = {
-  ...oneProduct,
-  name: 'Pedro',
-};
+jest.mock('bcrypt');
 
 describe('UsersService', () => {
   let service: UsersService;
   let prisma: PrismaService;
 
-  const db = {
-    users: {
-      findMany: jest.fn().mockResolvedValue(usersArray),
-      findFirst: jest.fn().mockResolvedValue(oneProduct),
-      create: jest.fn().mockResolvedValue(oneProduct),
-      update: jest.fn().mockResolvedValue(oneProductModified),
-      delete: jest.fn().mockResolvedValue(oneProduct),
-    },
-  };
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        UsersService,
-        {
-          provide: PrismaService,
-          useValue: db,
-        },
-      ],
+      providers: [UsersService, PrismaService],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
@@ -64,34 +24,122 @@ describe('UsersService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('getAll', () => {
-    it('should return an array of users', async () => {
-      expect(await service.findAll()).toEqual(usersArray);
+  it('should create a user', async () => {
+    const dto: CreateUserDto = {
+      name: 'Test',
+      email: 'test@test.com',
+      password: 'hashedPassword',
+      type: 'admin',
+    };
+
+    const hashedPassword = 'hashedPassword';
+    const expectedResult = { id: 1, ...dto, password: hashedPassword, active: true, createdAt: new Date(), updatedAt: new Date() };
+
+    (bcrypt.hash as jest.Mock).mockResolvedValue(hashedPassword);
+    jest.spyOn(prisma.users, 'create').mockResolvedValue(expectedResult);
+
+    expect(await service.create(dto)).toEqual(expectedResult);
+    expect(bcrypt.hash).toHaveBeenCalledWith(dto.password, 10);
+    expect(prisma.users.create).toHaveBeenCalledWith({
+      data: { ...dto, password: hashedPassword },
     });
   });
 
-  describe('getOne', () => {
-    it('should get a single users', () => {
-      expect(service.findOne(1)).resolves.toEqual(oneProduct);
+  it('should find all users', async () => {
+    const expectedResult = [
+      {
+        id: 1,
+        name: 'test',
+        email: 'test@test.com',
+        password: 'hashedPassword',
+        type: 'admin',
+        active: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
+
+    jest.spyOn(prisma.users, 'findMany').mockResolvedValue(expectedResult);
+
+    expect(await service.findAll()).toEqual(expectedResult);
+  });
+
+  it('should find one user', async () => {
+    const expectedResult = {
+      id: 1,
+      name: 'test',
+      email: 'test@test.com',
+      password: 'hashedPassword',
+      type: 'admin',
+      active: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    jest.spyOn(prisma.users, 'findFirst').mockResolvedValue(expectedResult);
+
+    expect(await service.findOne(1)).toEqual(expectedResult);
+    expect(prisma.users.findFirst).toHaveBeenCalledWith({
+      where: { id: 1 },
     });
   });
 
-  describe('insertOne', () => {
-    it('should successfully insert a users', () => {
-      expect(service.create(oneProduct)).resolves.toEqual(oneProduct);
+  it('should update a user', async () => {
+    const dto: UpdateUserDto = {
+      name: 'Updated',
+      password: 'hashedPassword!',
+      email: 'updated@test.com',
+      type: 'user',
+    };
+
+    const expectedResult = { id: 1, ...dto, password: 'hashedPassword', active: true, createdAt: new Date(), updatedAt: new Date() };
+
+    jest.spyOn(prisma.users, 'update').mockResolvedValue(expectedResult);
+
+    expect(await service.update(1, dto)).toEqual(expectedResult);
+    expect(prisma.users.update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: dto,
     });
   });
 
-  describe('updateOne', () => {
-    it('should call the update method', async () => {
-      const users = await service.update(1, oneProductModified);
-      expect(users).toEqual(oneProductModified);
+  it('should remove a user', async () => {
+    const expectedResult = {
+      id: 1,
+      name: 'test',
+      email: 'test@test.com',
+      password: 'hashedPassword',
+      type: 'admin',
+      active: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    jest.spyOn(prisma.users, 'delete').mockResolvedValue(expectedResult);
+
+    expect(await service.remove(1)).toEqual(expectedResult);
+    expect(prisma.users.delete).toHaveBeenCalledWith({
+      where: { id: 1 },
     });
   });
 
-  describe('deleteOne', () => {
-    it('should dlete a users', () => {
-      expect(service.remove(1)).resolves.toEqual(oneProduct);
+  it('should find a user by email', async () => {
+    const expectedResult = {
+      id: 1,
+      name: 'test',
+      email: 'test@test.com',
+      password: 'hashedPassword',
+      type: 'admin',
+      active: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    jest.spyOn(prisma.users, 'findFirst').mockResolvedValue(expectedResult);
+
+    expect(await service.findByEmail('test@test.com')).toEqual(expectedResult);
+    expect(prisma.users.findFirst).toHaveBeenCalledWith({
+      where: { email: 'test@test.com' },
     });
   });
 });
