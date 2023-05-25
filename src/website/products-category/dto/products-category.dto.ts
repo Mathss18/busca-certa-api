@@ -1,13 +1,17 @@
-import { IsNotEmpty, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
-import { PaginatedRouteDto } from '../../../shared/dto/paginated-route.dto';
 import { Type } from 'class-transformer';
+import { IsNotEmpty, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
 import { LocationDto } from '../../../shared/dto/location.dto';
 
-export class SearchByTermPaginatedDto extends PaginatedRouteDto {
+export class FindRelevantsByTermParams {
   @IsNotEmpty()
   @IsString()
   @MaxLength(40)
   term: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(40)
+  quantity: string;
 
   @IsOptional()
   @ValidateNested()
@@ -15,11 +19,11 @@ export class SearchByTermPaginatedDto extends PaginatedRouteDto {
   location?: LocationDto;
 }
 
-export class SearchByTermDto {
+export class FindRelevantsParams {
   @IsNotEmpty()
   @IsString()
   @MaxLength(40)
-  term: string;
+  quantity: string;
 
   @IsOptional()
   @ValidateNested()

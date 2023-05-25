@@ -2,10 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { applyDefaultOrder } from '../../utils/applyDefaultOrder';
 import { SearchByTermDto, SearchByTermPaginatedDto } from './dto/product.dto';
+import { LocationDto } from '../../shared/dto/location.dto';
+import { FilerByLocationRepository } from '../shared/filter-by-location/filter-by-location';
 
 @Injectable()
-export class ProductRepository {
-  constructor(private readonly prismaService: PrismaService) {}
+export class ProductRepository extends FilerByLocationRepository {
+  constructor(private readonly prismaService: PrismaService) {
+    super();
+  }
 
   async findProductByTerm(params: SearchByTermPaginatedDto) {
     const skip = (params.page - 1) * params.pageSize;
@@ -21,6 +25,7 @@ export class ProductRepository {
         select: {
           companyName: true,
           logo: true,
+          actionAreas: true,
         },
       },
       productsVariations: this.selectProductVariations(),
@@ -28,9 +33,9 @@ export class ProductRepository {
 
     const searchTerm = params.term.toLowerCase();
 
-    const count = await this.prismaService.products.count({ where: this.productsCondition(searchTerm) });
+    const count = await this.prismaService.products.count({ where: this.productsCondition(searchTerm, params.location) });
     const products = await this.prismaService.products.findMany({
-      where: this.productsCondition(searchTerm),
+      where: this.productsCondition(searchTerm, params.location),
       select: selectFields,
       take: params.pageSize,
       skip: skip,
@@ -65,7 +70,7 @@ export class ProductRepository {
     const searchTerm = params.term.toLowerCase();
 
     return await this.prismaService.products.findFirst({
-      where: this.productsCondition(searchTerm),
+      where: this.productsCondition(searchTerm, params.location),
       select: selectFields,
       orderBy: applyDefaultOrder('rating', 'desc'),
     });
@@ -138,8 +143,8 @@ export class ProductRepository {
     };
   }
 
-  private productsCondition(searchTerm: string) {
-    return {
+  private productsCondition(searchTerm: string, location?: LocationDto) {
+    const condition = {
       OR: [
         {
           name: {
@@ -192,5 +197,10 @@ export class ProductRepository {
       ],
       active: { equals: true },
     };
+
+    if (location) {
+      condition['AND'] = [this.filterBySupplierActionAreas(location)];
+    }
+    return condition;
   }
 }

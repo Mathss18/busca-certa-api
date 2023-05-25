@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductsCategoryController } from './products-category.controller';
 import { ProductsCategoryService } from './products-category.service';
-import { FindRelevantsParams, FindRelevantsByTermParams } from './interfaces/products-category.interface';
+import { FindRelevantsParams, FindRelevantsByTermParams } from './dto/products-category.dto';
 import { HttpReturn } from '../../shared/http-response';
 import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';

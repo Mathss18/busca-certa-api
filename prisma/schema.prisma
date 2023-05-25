@@ -28,6 +28,7 @@ model Supplier {
   city               String
   state              String
   zipCode            String
+  actionAreas        Json?              @default("[]")
   supplierCategoryId Int?
   supplierCategory   SuppliersCategory? @relation(fields: [supplierCategoryId], references: [id])
   products           Products[]
@@ -207,7 +208,7 @@ model Estimate {
   clientMessage             String?                    @db.Text
   productId                 Int
   quantity                  Int
-  price                     Decimal                    @db.Decimal(9,2) @default(0)
+  price                     Decimal                    @default(0) @db.Decimal(9, 2)
   product                   Products                   @relation(fields: [productId], references: [id])
   estimateProductVariations EstimateProductVariation[]
   nonce                     String                     @unique

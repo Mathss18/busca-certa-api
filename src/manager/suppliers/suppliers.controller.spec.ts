@@ -163,15 +163,6 @@ describe('SuppliersController', () => {
       const emailError = validationErrors.find((error) => error.property === 'email');
       expect(emailError).toBeDefined();
     });
-
-    it('should fail validation due to invalid URL', async () => {
-      const dto = new CreateSupplierDto();
-      dto.logo = 'invalid-url';
-      const validationErrors = await validate(dto);
-
-      const urlError = validationErrors.find((error) => error.property === 'logo');
-      expect(urlError).toBeDefined();
-    });
   });
 
   afterEach(async () => {

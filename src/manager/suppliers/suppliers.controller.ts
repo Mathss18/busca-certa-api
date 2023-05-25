@@ -1,4 +1,18 @@
-import { Controller, Get, Post, Body, Param, Delete, Res, HttpStatus, Put, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Res,
+  HttpStatus,
+  Put,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  Patch,
+} from '@nestjs/common';
 import { SuppliersService } from './suppliers.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
@@ -7,6 +21,7 @@ import { HttpReturn } from '../../shared/http-response';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { S3Service } from '../../aws/s3/s3.service';
+import { UpdateSupplierActionAreasDto } from './dto/update-supplier-action-areas.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('manager/suppliers')
@@ -85,6 +100,19 @@ export class SuppliersController {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
           data: await this.suppliersService.remove(+id),
+        }),
+      );
+    } catch (error) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpReturn.build({ success: false, message: error.message }));
+    }
+  }
+
+  @Patch(':id/action-areas')
+  async updateActionAreas(@Param('id') id: string, @Body() updateActionAreasDto: UpdateSupplierActionAreasDto, @Res() res: Response) {
+    try {
+      return res.status(HttpStatus.OK).json(
+        HttpReturn.build({
+          data: await this.suppliersService.updateActionAreas(+id, updateActionAreasDto),
         }),
       );
     } catch (error) {

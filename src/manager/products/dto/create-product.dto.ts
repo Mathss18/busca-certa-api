@@ -21,9 +21,7 @@ export class CreateProductDto {
   @MaxLength(191)
   brand: string;
 
-  @IsOptional()
-  @IsUrl()
-  image?: any;
+  image: any;
 
   @IsOptional()
   @IsNumber()

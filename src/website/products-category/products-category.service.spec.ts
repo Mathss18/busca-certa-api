@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductsCategoryService } from './products-category.service';
 import { ProductsCategoryRepository } from './products-category.repository';
-import { FindRelevantsByTermParams, FindRelevantsParams } from './interfaces/products-category.interface';
+import { FindRelevantsByTermParams, FindRelevantsParams } from './dto/products-category.dto';
 import { sortLevensthein } from '../../utils/sort.util';
 
 describe('ProductsCategoryService', () => {

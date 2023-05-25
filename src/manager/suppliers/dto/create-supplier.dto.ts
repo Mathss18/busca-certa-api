@@ -38,7 +38,6 @@ export class CreateSupplierDto {
   @IsString()
   description: string;
 
-  @IsUrl()
   logo: string;
 
   @IsString()

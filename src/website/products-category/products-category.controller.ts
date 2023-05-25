@@ -2,7 +2,7 @@ import { Controller, Get, Res, HttpStatus, Body, Query, Post } from '@nestjs/com
 import { ProductsCategoryService } from './products-category.service';
 import { Response } from 'express';
 import { HttpReturn } from '../../shared/http-response';
-import { FindRelevantsByTermParams, FindRelevantsParams } from './interfaces/products-category.interface';
+import { FindRelevantsByTermParams, FindRelevantsParams } from './dto/products-category.dto';
 
 @Controller('website/products-category')
 export class ProductsCategoryController {

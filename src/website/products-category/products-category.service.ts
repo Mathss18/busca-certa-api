@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ProductsCategoryRepository } from './products-category.repository';
-import { FindRelevantsByTermParams, FindRelevantsParams } from './interfaces/products-category.interface';
+import { FindRelevantsByTermParams, FindRelevantsParams } from './dto/products-category.dto';
 import { sortLevensthein } from '../../utils/sort.util';
 
 @Injectable()

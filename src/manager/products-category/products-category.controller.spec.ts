@@ -145,18 +145,6 @@ describe('ProductCategoryController', () => {
       const validationErrors = await validate(dto);
       expect(validationErrors).not.toHaveLength(0);
     });
-
-    it('should fail validation due to invalid URL', async () => {
-      const dto = new CreateProductsCategoryDto();
-      dto.name = 'Test Category';
-      dto.image = 'invalid-url';
-      dto.parentId = 1;
-      dto.active = true;
-
-      const validationErrors = await validate(dto);
-      const urlError = validationErrors.find((error) => error.property === 'image');
-      expect(urlError).toBeDefined();
-    });
   });
 
   afterEach(async () => {
