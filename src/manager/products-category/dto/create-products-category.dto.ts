@@ -11,8 +11,10 @@ export class CreateProductsCategoryDto {
   @IsUrl()
   image?: string;
 
-  @IsNumber()
-  @Transform(({ value }) => Number(value))
+  @Transform(({ value }) => {
+    if (value === null) return value;
+    Number(value);
+  })
   @IsOptional()
   parentId?: number;
 

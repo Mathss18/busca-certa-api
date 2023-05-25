@@ -10,7 +10,10 @@ export class UpdateProductsCategoryDto {
   @IsOptional()
   image?: string;
 
-  @Transform(({ value }) => Number(value))
+  @Transform(({ value }) => {
+    if (value === null) return value;
+    Number(value);
+  })
   @IsOptional()
   parentId?: number;
 
