@@ -18,10 +18,12 @@ export class MailService {
       subject: subject,
       template: templatePath,
       context: context,
-      attachments: attachments ? await this.resolveAttachments(attachments) : null,
     };
     if (from) {
       options.from = from;
+    }
+    if (attachments && attachments.length > 0) {
+      options.attachments = await this.resolveAttachments(attachments);
     }
     await this.mailerService.sendMail(options);
   }
