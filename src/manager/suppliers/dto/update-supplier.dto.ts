@@ -60,7 +60,8 @@ export class UpdateSupplierDto {
   @IsString()
   zipCode: string;
 
-  actionAreas: string;
+  @IsOptional()
+  actionAreas?: string;
 
   @IsBoolean()
   @Transform(({ value }) => {
