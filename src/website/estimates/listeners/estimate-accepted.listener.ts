@@ -73,7 +73,7 @@ export class EstimateAcceptedListener {
   }
 
   private async sendWhatsappToClient(estimate) {
-    const { id, product, quantity, price, clientPhone } = estimate;
+    const { id, product, quantity, price, clientPhone, clientName } = estimate;
     try {
       const to = `55${clientPhone}`;
       await this.whatsappService.sendTemplateMessage(to, {
@@ -85,6 +85,10 @@ export class EstimateAcceptedListener {
           {
             type: 'body',
             parameters: [
+              {
+                type: 'text',
+                text: clientName,
+              },
               {
                 type: 'text',
                 text: `${id}`,
@@ -140,18 +144,8 @@ export class EstimateAcceptedListener {
   }
 
   private async sendWhatsappToSupplier(estimate) {
-    const { product } = estimate;
-    try {
-      const to = `55${product.supplier.mobileNumber}`;
-      await this.whatsappService.sendTemplateMessage(to, {
-        language: {
-          code: 'en_US',
-        },
-        name: 'hello_world',
-      });
-    } catch (error) {
-      console.log(error.message);
-    }
+    console.log('Estimate Accepted - Whatsapp to supplier (NOT IMPLEMENTED)');
+    return;
   }
 
   private formatPhoneNumber(phoneNumber: string) {
