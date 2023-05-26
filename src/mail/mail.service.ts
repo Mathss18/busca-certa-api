@@ -29,6 +29,7 @@ export class MailService {
       await this.mailerService.sendMail(options);
     } catch (error) {
       console.log('Falha ao enviar Email' + error.message);
+      throw error;
     }
   }
 
