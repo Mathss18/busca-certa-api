@@ -76,7 +76,7 @@ export class EstimateDeclinedListener {
     try {
       const to = `55${clientPhone}`;
       await this.whatsappService.sendTemplateMessage(to, {
-        name: 'estimate_declined_to_client',
+        name: 'estimate_declined_to_client2',
         language: {
           code: 'pt_BR',
         },

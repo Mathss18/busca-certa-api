@@ -25,7 +25,11 @@ export class MailService {
     if (attachments && attachments.length > 0) {
       options.attachments = await this.resolveAttachments(attachments);
     }
-    await this.mailerService.sendMail(options);
+    try {
+      await this.mailerService.sendMail(options);
+    } catch (error) {
+      console.log('Falha ao enviar Email' + error.message);
+    }
   }
 
   private async resolveAttachments(attachments: Attachment[]) {

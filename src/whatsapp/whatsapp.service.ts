@@ -51,7 +51,11 @@ export class WhatsappService implements IWhatsappService {
       },
     };
     try {
-      return await axios.post(this.configService.get('whatsapp.apiUrl'), data, { headers: this.headers });
+      try {
+        return await axios.post(this.configService.get('whatsapp.apiUrl'), data, { headers: this.headers });
+      } catch (error) {
+        console.log('Falha ao enviar Whatsapp' + error.message);
+      }
     } catch (error) {
       throw error;
     }
