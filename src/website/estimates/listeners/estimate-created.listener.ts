@@ -47,7 +47,7 @@ export class EstimateCreatedListener {
   private sendEmailToSupplier(estimate) {
     const { id, clientName, product, quantity, clientMessage, estimateProductVariations, nonce, clientFile } = estimate;
 
-    const attachments = [{ url: clientFile }] ?? null;
+    const attachments = clientFile ? [{ url: clientFile }] : null;
 
     const data = {
       estimateId: id,
