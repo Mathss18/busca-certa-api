@@ -84,6 +84,9 @@ export class SuppliersController {
         const fileName = `${updateSupplierDto.cnpj}-logo.${extension}`;
         updateSupplierDto.logo = await this.s3Service.upload(fileName, logo.buffer);
       }
+
+      delete updateSupplierDto.actionAreas;
+
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
           data: await this.suppliersService.update(+id, updateSupplierDto),
