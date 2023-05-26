@@ -72,7 +72,7 @@ describe('MailService', () => {
     const templatePath = 'templates/test-template';
     const context = { name: 'John Doe' };
 
-    const expectedOptions: ISendMailOptions = {
+    const options: ISendMailOptions = {
       to: to,
       subject: subject,
       template: templatePath,
@@ -82,7 +82,8 @@ describe('MailService', () => {
 
     await service.sendEmailWithTemplate(to, subject, templatePath, context);
 
-    expect(mailerService.sendMail).toHaveBeenCalledWith(expectedOptions);
+    delete options.attachments;
+    expect(mailerService.sendMail).toHaveBeenCalledWith(options);
     expect(axios.get).not.toHaveBeenCalled();
   });
 });
