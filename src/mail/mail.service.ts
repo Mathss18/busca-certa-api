@@ -13,19 +13,19 @@ export class MailService {
   constructor(private mailerService: MailerService) {}
 
   async sendEmailWithTemplate(to: string, subject: string, templatePath: string, context: any, from?: string, attachments?: Attachment[]) {
-    const options: ISendMailOptions = {
-      to: to,
-      subject: subject,
-      template: templatePath,
-      context: context,
-    };
-    if (from) {
-      options.from = from;
-    }
-    if (attachments && attachments.length > 0) {
-      options.attachments = await this.resolveAttachments(attachments);
-    }
     try {
+      const options: ISendMailOptions = {
+        to: to,
+        subject: subject,
+        template: templatePath,
+        context: context,
+      };
+      if (from) {
+        options.from = from;
+      }
+      if (attachments && attachments.length > 0) {
+        options.attachments = await this.resolveAttachments(attachments);
+      }
       await this.mailerService.sendMail(options);
     } catch (error) {
       console.log('Falha ao enviar Email' + error.message);

@@ -41,23 +41,20 @@ export class WhatsappService implements IWhatsappService {
   };
 
   async sendTemplateMessage(to: string, payload: TemplateMessagePayload): Promise<void> {
-    const data = {
-      messaging_product: 'whatsapp',
-      to: to,
-      type: 'template',
-      template: {
-        namespace: '92866f51_8b55_4e71_ac83_52688232891e',
-        ...payload,
-      },
-    };
     try {
-      try {
-        return await axios.post(this.configService.get('whatsapp.apiUrl'), data, { headers: this.headers });
-      } catch (error) {
-        console.log('Falha ao enviar Whatsapp' + error.message);
-      }
+      const data = {
+        messaging_product: 'whatsapp',
+        to: to,
+        type: 'template',
+        template: {
+          namespace: '92866f51_8b55_4e71_ac83_52688232891e',
+          ...payload,
+        },
+      };
+
+      return await axios.post(this.configService.get('whatsapp.apiUrl'), data, { headers: this.headers });
     } catch (error) {
-      throw error;
+      console.log('Falha ao enviar Whatsapp' + error.message);
     }
   }
 }
