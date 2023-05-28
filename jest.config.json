@@ -14,7 +14,7 @@
   ],
   "coverageDirectory": "../coverage",
   "testEnvironment": "node",
-  "collectCoverage": true,
+  "collectCoverage": false,
   "coveragePathIgnorePatterns": [
       "node_modules",
       "test-config",

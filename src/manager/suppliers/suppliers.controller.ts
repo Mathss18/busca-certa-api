@@ -85,7 +85,7 @@ export class SuppliersController {
         updateSupplierDto.logo = await this.s3Service.upload(fileName, logo.buffer, Folder.SUPPLIERS);
       }
 
-      if (updateSupplierDto?.actionAreas) delete updateSupplierDto.actionAreas;
+      if (Object.prototype.hasOwnProperty.call(updateSupplierDto, 'actionAreas')) delete updateSupplierDto.actionAreas;
 
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({

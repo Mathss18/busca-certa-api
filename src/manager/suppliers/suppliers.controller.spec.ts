@@ -124,6 +124,21 @@ describe('SuppliersController', () => {
       .expect({ success: true, data: `Removed supplier ${id}`, message: '' });
   });
 
+  it('should not update set supplier action areas to empty string when update', async () => {
+    const id = '1';
+    const updateSupplierDto = new UpdateSupplierDto();
+    updateSupplierDto.companyName = 'Updated Supplier';
+    updateSupplierDto.actionAreas = ''; // sending incorrect action areas
+    mockSuppliersService.update.mockResolvedValue(`Updated supplier ${id}`);
+
+    const dtoWithoutActionAreas = { ...updateSupplierDto };
+    delete dtoWithoutActionAreas.actionAreas;
+
+    await request(app.getHttpServer()).put(`/manager/suppliers/${id}`).send(updateSupplierDto).expect(HttpStatus.OK);
+
+    expect(mockSuppliersService.update).toHaveBeenCalledWith(1, dtoWithoutActionAreas);
+  });
+
   describe('CreateSupplierDto', () => {
     it('should be valid with all fields', async () => {
       const dto = new CreateSupplierDto();
