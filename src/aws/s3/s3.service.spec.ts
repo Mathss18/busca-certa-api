@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
-import { S3Service } from './s3.service';
+import { Folder, S3Service } from './s3.service';
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 
 jest.mock('@aws-sdk/client-s3');
@@ -48,9 +48,9 @@ describe('S3Service', () => {
       }
     });
 
-    const expectedUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${filename}`;
+    const expectedUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${Folder.PRODUCTS}/${filename}`;
 
-    expect(await service.upload(filename, file)).toEqual(expectedUrl);
+    expect(await service.upload(filename, file, Folder.PRODUCTS)).toEqual(expectedUrl);
     expect(s3Client.send).toHaveBeenCalledWith(expect.any(PutObjectCommand));
   });
 

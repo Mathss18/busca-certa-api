@@ -6,7 +6,7 @@ import { HttpReturn } from '../../shared/http-response';
 import { Response } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { S3Service } from '../../aws/s3/s3.service';
+import { Folder, S3Service } from '../../aws/s3/s3.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('manager/products')
@@ -24,7 +24,7 @@ export class ProductsController {
     const extension = image.mimetype.split('/')[1];
     const fileName = `${createProductDto.name}-${createProductDto.supplierId}-product.${extension}`;
     try {
-      createProductDto.image = await this.s3Service.upload(fileName, image.buffer);
+      createProductDto.image = await this.s3Service.upload(fileName, image.buffer, Folder.PRODUCTS);
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
           data: await this.productsService.create(createProductDto),
@@ -75,7 +75,7 @@ export class ProductsController {
       if (image) {
         const extension = image.mimetype.split('/')[1];
         const fileName = `${updateProductDto.name}-${updateProductDto.supplierId}-product.${extension}`;
-        updateProductDto.image = await this.s3Service.upload(fileName, image.buffer);
+        updateProductDto.image = await this.s3Service.upload(fileName, image.buffer, Folder.PRODUCTS);
       }
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({

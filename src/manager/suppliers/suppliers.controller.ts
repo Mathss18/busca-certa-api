@@ -20,7 +20,7 @@ import { Response } from 'express';
 import { HttpReturn } from '../../shared/http-response';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { S3Service } from '../../aws/s3/s3.service';
+import { Folder, S3Service } from '../../aws/s3/s3.service';
 import { UpdateSupplierActionAreasDto } from './dto/update-supplier-action-areas.dto';
 
 @UseGuards(JwtAuthGuard)
@@ -38,7 +38,7 @@ export class SuppliersController {
   ) {
     const extension = logo.mimetype.split('/')[1];
     const fileName = `${createSupplierDto.cnpj}-logo.${extension}`;
-    createSupplierDto.logo = await this.s3Service.upload(fileName, logo.buffer);
+    createSupplierDto.logo = await this.s3Service.upload(fileName, logo.buffer, Folder.SUPPLIERS);
     try {
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({
@@ -82,7 +82,7 @@ export class SuppliersController {
       if (logo) {
         const extension = logo.mimetype.split('/')[1];
         const fileName = `${updateSupplierDto.cnpj}-logo.${extension}`;
-        updateSupplierDto.logo = await this.s3Service.upload(fileName, logo.buffer);
+        updateSupplierDto.logo = await this.s3Service.upload(fileName, logo.buffer, Folder.SUPPLIERS);
       }
 
       if (updateSupplierDto?.actionAreas) delete updateSupplierDto.actionAreas;

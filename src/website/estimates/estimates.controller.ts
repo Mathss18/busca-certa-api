@@ -4,7 +4,7 @@ import { AcceptEstimateDto, CreateEstimateDto, DeclineEstimateDto } from './dto/
 import { HttpReturn } from '../../shared/http-response';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { S3Service } from '../../aws/s3/s3.service';
+import { Folder, S3Service } from '../../aws/s3/s3.service';
 import { v4 as uuid } from 'uuid';
 
 @Controller('website/estimates')
@@ -37,7 +37,7 @@ export class EstimatesController {
       }
     }
     try {
-      if (clientFile) createEstimateDto.clientFile = await this.s3Service.upload(fileName, clientFile.buffer);
+      if (clientFile) createEstimateDto.clientFile = await this.s3Service.upload(fileName, clientFile.buffer, Folder.ATTACHMENTS);
 
       return res.status(HttpStatus.OK).json(
         HttpReturn.build({

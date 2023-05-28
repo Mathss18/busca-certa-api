@@ -2,6 +2,14 @@ import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+export enum Folder {
+  ATTACHMENTS = 'attachments',
+  PRODUCTS = 'products',
+  SUPPLIERS = 'suppliers',
+  WEBSITE = 'website',
+  PRODUCTS_CATEGORY = 'products-category',
+}
+
 @Injectable()
 export class S3Service {
   private readonly s3Client: S3Client;
@@ -16,17 +24,19 @@ export class S3Service {
     });
   }
 
-  async upload(filename: string, file: Buffer): Promise<string> {
+  async upload(filename: string, file: Buffer, folder: Folder): Promise<string> {
+    const filePath = `${folder}/${filename}`;
+
     await this.s3Client.send(
       new PutObjectCommand({
         Bucket: this.bucketName,
-        Key: filename,
+        Key: filePath, // use the new filePath here
         Body: file,
         ACL: 'public-read',
       }),
     );
 
-    return `https://${this.bucketName}.s3.${this.configService.get('aws.region')}.amazonaws.com/${filename}`;
+    return `https://${this.bucketName}.s3.${this.configService.get('aws.region')}.amazonaws.com/${filePath}`;
   }
 
   async delete(filename: string): Promise<void> {
