@@ -6,11 +6,13 @@ import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Folder, S3Service } from '../../aws/s3/s3.service';
 import { v4 as uuid } from 'uuid';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('website/estimates')
 export class EstimatesController {
   constructor(private readonly estimatesService: EstimatesService, private readonly s3Service: S3Service) {}
 
+  @Throttle(5, 60)
   @Post('/create')
   @UseInterceptors(FileInterceptor('clientFile'))
   async create(

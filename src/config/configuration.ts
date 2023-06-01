@@ -19,6 +19,7 @@ export default () => ({
     from: process.env.MAIL_FROM,
     from_name: process.env.MAIL_FROM_NAME,
     transport: process.env.MAIL_TRANSPORT,
+    ssl: process.env.MAIL_SSL,
   },
   whatsapp: {
     accountId: process.env.WHATSAPP_ACCOUNT_ID,
